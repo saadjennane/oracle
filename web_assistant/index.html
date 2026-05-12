@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Oracle Assistant</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000; color: #fff;
+      min-height: 100vh; display: flex; flex-direction: column;
+      -webkit-user-select: none; user-select: none;
+      overflow: hidden;
+    }
+
+    /* Chain progress bar */
+    .chain-bar {
+      display: none; padding: 12px 16px;
+      background: #111; border-bottom: 1px solid #222;
+      overflow-x: auto; white-space: nowrap; text-align: center;
+    }
+    .chain-bar.visible { display: flex; justify-content: center; align-items: center; gap: 6px; }
+    .chain-item { font-size: 12px; color: #666; }
+    .chain-item.active { color: #007AFF; font-weight: bold; }
+    .chain-sep { font-size: 10px; color: #444; }
+
+    /* States */
+    .state { display: none; flex: 1; flex-direction: column; justify-content: center; align-items: center; padding: 24px; }
+    .state.active { display: flex; }
+
+    /* Idle */
+    #idle p { color: #666; font-size: 16px; }
+
+    /* Buttons mode */
+    .preset-name { font-size: 14px; color: #888; margin-bottom: 8px; }
+    .round-info { font-size: 13px; color: #555; margin-bottom: 24px; }
+    .options-grid {
+      display: flex; flex-direction: column; gap: 12px;
+      width: 100%; max-width: 400px;
+    }
+    .option-btn {
+      background: #1a1a2e; border: 2px solid #007AFF; border-radius: 12px;
+      color: #fff; font-size: 18px; font-weight: 600; padding: 20px;
+      cursor: pointer; transition: all 0.15s; text-align: center;
+    }
+    .option-btn:active { background: #007AFF; transform: scale(0.97); }
+
+    /* Black screen mode */
+    #blackscreen {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: #000; touch-action: none;
+    }
+
+    /* Decoy mode — Google Image Lightbox (light theme by default to match
+       the real Google UI). Layout fills the viewport and captures gestures
+       through a transparent overlay. */
+    #decoy {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: #fff; padding: 0;
+      overflow: hidden;
+      display: none; flex-direction: column;
+      color: #202124;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #decoy.active { display: flex; }
+
+    .dec-appbar {
+      flex: 0 0 auto;
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 12px; background: #fff;
+      border-bottom: 1px solid #f1f3f4;
+    }
+    .dec-favicon {
+      width: 32px; height: 32px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .dec-favicon img { width: 100%; height: 100%; object-fit: cover; }
+    .dec-site-name { flex: 1; font-size: 16px; font-weight: 500; color: #202124;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dec-icon-btn { width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #5f6368; font-size: 20px; line-height: 1; }
+
+    .dec-image-area {
+      /* Take ~60vh so the main image dominates the viewport (matches
+         Google's lightbox where the image is the focal point and the
+         footer/carousel sit below the fold). */
+      flex: 0 0 auto;
+      height: 60vh; min-height: 320px;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; position: relative; overflow: hidden;
+      touch-action: none;
+    }
+    .dec-image-area img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      pointer-events: none; -webkit-user-drag: none; user-select: none;
+    }
+    .dec-lens {
+      position: absolute; left: 10px; bottom: 10px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(60,64,67,0.85); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dec-lens svg { width: 16px; height: 16px; }
+
+    .dec-footer {
+      /* Static visual area — never scrolled. The encoded summary lives
+         in a hidden modal that the performer reveals via a long-press
+         anywhere in this region. */
+      flex: 1 1 auto; min-height: 0;
+      background: #fff;
+      padding: 10px 12px 6px;
+      border-top: 1px solid #f1f3f4;
+      overflow: hidden;
+      position: relative;
+    }
+    .dec-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .dec-title { flex: 1; font-size: 14px; font-weight: 500; color: #202124;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dec-visit { flex-shrink: 0; background: #1a73e8; color: #fff;
+      padding: 7px 16px; border-radius: 20px;
+      font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 2px; }
+    .dec-visit::after { content: ' ›'; font-size: 16px; line-height: 1; }
+    .dec-copyright { font-size: 11px; color: #5f6368; margin-bottom: 10px; }
+    .dec-copyright b { color: #202124; font-weight: 500; }
+    .dec-actions { display: flex; gap: 6px; margin-bottom: 10px; }
+    .dec-action { flex: 1; background: #f1f3f4; color: #202124;
+      border-radius: 22px; padding: 8px 14px;
+      font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* Thumbnails grid: Google's lightbox uses 2 columns, slightly portrait
+       cards (~4:5) so that more rows can peek below the fold. */
+    .dec-carousel {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 8px; padding-bottom: 4px;
+    }
+    .dec-thumb { aspect-ratio: 4/5; border-radius: 8px; overflow: hidden; background: #f1f3f4; }
+    .dec-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .dec-dots { display: flex; justify-content: center; gap: 4px; padding: 6px 0 8px; }
+    .dec-dots span { width: 6px; height: 6px; border-radius: 50%; background: #dadce0; }
+    .dec-dots span.active { background: #5f6368; width: 18px; border-radius: 3px; }
+
+    .dec-overlay {
+      position: absolute; inset: 0;
+      background: transparent; touch-action: none;
+    }
+
+    /* Zone tick marks — tiny marks on the edges of the image area at each
+       zone boundary, so the performer can identify zone limits at a glance.
+       Row boundaries (horizontal layouts) sit on the left edge, column
+       boundaries (grid layouts) sit on the top edge. Discreet enough that
+       the spectator doesn't notice. */
+    .dec-zone-ticks {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .dec-zone-tick {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.22);
+    }
+    .dec-zone-tick.row { left: 0; width: 6px; height: 2px; transform: translateY(-1px); }
+    .dec-zone-tick.col { top: 0; width: 2px; height: 6px; transform: translateX(-1px); }
+    /* Discreet input indicator — a small low-opacity character in the
+       bottom-right corner that flashes the last registered input (zone
+       number for taps, direction letter for swipes, "■" for lock). Visible
+       enough for the performer to confirm the input registered, subtle
+       enough not to break the illusion. */
+    #decoyDot {
+      position: fixed; right: 10px; bottom: 10px;
+      min-width: 14px; height: 14px; line-height: 14px; text-align: center;
+      font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 500;
+      color: rgba(60, 64, 67, 0);
+      pointer-events: none;
+      transition: color 500ms ease-out;
+    }
+    #decoyDot.pulse {
+      color: rgba(60, 64, 67, 0.55);
+      transition: color 80ms ease-out;
+    }
+    #decoyDot.locked {
+      color: rgba(220, 38, 38, 0.65);
+    }
+
+    /* Encoded input reveal — sequence of inputs (zone numbers for taps,
+       direction letters for swipes, "■" for lock). Hidden by default;
+       revealed as a centered overlay when the performer long-presses the
+       footer area, hidden again on release. */
+    .dec-reveal {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(32, 33, 36, 0.78);
+      pointer-events: none;
+      opacity: 0; transition: opacity 120ms ease-out;
+      z-index: 50;
+    }
+    .dec-reveal.visible { opacity: 1; }
+    .dec-reveal-text {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 22px; font-weight: 600;
+      letter-spacing: 4px;
+      color: #ffffff;
+      padding: 20px 28px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      min-width: 80px; text-align: center;
+      user-select: none;
+    }
+
+    /* Dark mode — follows the OS / browser preference. Mirrors Google's
+       dark Image Lightbox palette so the decoy stays plausible whichever
+       theme the spectator's device is set to. */
+    @media (prefers-color-scheme: dark) {
+      #decoy { background: #202124; color: #e8eaed; }
+      .dec-appbar { background: #202124; border-bottom-color: #3c4043; }
+      .dec-site-name { color: #e8eaed; }
+      .dec-icon-btn { color: #9aa0a6; }
+      .dec-image-area { background: #202124; }
+      .dec-footer { background: #202124; border-top-color: #3c4043; }
+      .dec-title { color: #e8eaed; }
+      .dec-visit { background: #8ab4f8; color: #202124; }
+      .dec-copyright { color: #9aa0a6; }
+      .dec-copyright b { color: #e8eaed; }
+      .dec-action { background: #303134; color: #e8eaed; }
+      .dec-action svg { stroke: #e8eaed; }
+      .dec-thumb { background: #303134; }
+      .dec-dots span { background: #5f6368; }
+      .dec-dots span.active { background: #e8eaed; }
+      .dec-zone-tick { background: rgba(255, 255, 255, 0.22); }
+      #decoyDot { color: rgba(232, 234, 237, 0); }
+      #decoyDot.pulse { color: rgba(232, 234, 237, 0.55); }
+      #decoyDot.locked { color: rgba(248, 113, 113, 0.7); }
+    }
+
+    /* Free text */
+    .free-text-input {
+      width: 100%; max-width: 400px;
+      background: #111; border: 1px solid #333; border-radius: 12px;
+      color: #fff; font-size: 16px; padding: 16px;
+      resize: vertical; min-height: 120px;
+      font-family: inherit;
+    }
+    .send-btn {
+      background: #007AFF; color: #fff; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 600; padding: 16px 40px;
+      cursor: pointer; margin-top: 16px;
+    }
+    .send-btn:active { opacity: 0.8; }
+
+    /* Feedback */
+    .feedback {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(0,122,255,0.9); color: #fff; padding: 16px 32px;
+      border-radius: 12px; font-size: 18px; font-weight: bold;
+      display: none; z-index: 100;
+    }
+    .feedback.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="chain-bar" id="chainBar"></div>
+
+  <!-- Idle state -->
+  <div class="state active" id="idle">
+    <p>Waiting for session...</p>
+  </div>
+
+  <!-- Active: buttons mode -->
+  <div class="state" id="buttons">
+    <div class="preset-name" id="presetName"></div>
+    <div class="round-info" id="roundInfo"></div>
+    <div class="options-grid" id="optionsGrid"></div>
+    <!-- Free text field alongside buttons -->
+    <div id="inlineFreeText" style="display:none; margin-top:24px; width:100%; max-width:400px;">
+      <div style="height:1px; background:#333; margin-bottom:16px;"></div>
+      <textarea class="free-text-input" id="inlineFreeTextInput" placeholder="Free text..." style="min-height:60px;"></textarea>
+      <button class="send-btn" onclick="sendInlineFreeText()" style="margin-top:8px;">Send Text</button>
+    </div>
+  </div>
+
+  <!-- Active: black screen (tap/swipe) -->
+  <div class="state" id="blackscreen"></div>
+
+  <!-- Decoy mode: dynamic Google Image Lightbox-style template -->
+  <div id="decoy">
+    <div class="dec-appbar">
+      <div class="dec-favicon" id="decFavicon">G</div>
+      <div class="dec-site-name" id="decSiteName"></div>
+      <div class="dec-icon-btn">⋮</div>
+      <div class="dec-icon-btn">×</div>
+    </div>
+    <div class="dec-image-area">
+      <img id="decoyImg" alt="" />
+      <div class="dec-lens">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </div>
+      <div class="dec-zone-ticks" id="decZoneTicks"></div>
+      <div class="dec-overlay" id="decOverlay"></div>
+    </div>
+    <div class="dec-footer">
+      <div class="dec-title-row">
+        <div class="dec-title" id="decTitle"></div>
+        <div class="dec-visit">Visit</div>
+      </div>
+      <div class="dec-copyright" id="decCopyright"></div>
+      <div class="dec-actions">
+        <div class="dec-action">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#202124" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V4M12 4l-5 5M12 4l5 5"/>
+            <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>
+          </svg>
+          Share
+        </div>
+        <div class="dec-action">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#202124" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          Save
+        </div>
+      </div>
+      <div class="dec-carousel" id="decCarousel"></div>
+      <div class="dec-dots"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+    <div id="decoyDot"></div>
+    <!-- Long-press reveal overlay for the encoded input summary -->
+    <div class="dec-reveal" id="decReveal"><div class="dec-reveal-text" id="decRevealText"></div></div>
+  </div>
+
+  <!-- Free text mode -->
+  <div class="state" id="freetext">
+    <textarea class="free-text-input" id="freeTextInput" placeholder="Enter text..."></textarea>
+    <button class="send-btn" onclick="sendFreeText()">Send</button>
+  </div>
+
+  <!-- Acrostic position picker -->
+  <div class="state" id="acrosticPosition">
+    <p style="color:#aaa; font-size:13px; margin:0 0 12px;">Pick the acrostic position</p>
+    <div class="buttons" id="acrosticPositionButtons"></div>
+  </div>
+
+  <!-- Auto mode status -->
+  <div class="state" id="automode">
+    <p style="color:#007AFF; font-size:16px;" id="autoStatus">Waiting for session...</p>
+  </div>
+
+  <!-- Visual feedback -->
+  <div class="feedback" id="feedback"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, onValue, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsfzT6egiJd3eYGVeZfnsWZpr06L9f-qg",
+      authDomain: "oracle-5233b.firebaseapp.com",
+      databaseURL: "https://oracle-5233b-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "oracle-5233b",
+      storageBucket: "oracle-5233b.firebasestorage.app",
+      messagingSenderId: "73289997112",
+      appId: "1:73289997112:web:2abbe7b6d5afe820793fcd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Get assistant ID and command from URL
+    // oass.app/sj          → normal mode
+    // oass.app/sj/freetext  → direct free text input
+    // oass.app/sj/112       → auto-send sequence (1=option0, 2=option1, ...)
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const params = new URLSearchParams(window.location.search);
+    const assistantId = pathParts[0] || params.get('id');
+    const urlCommand = pathParts[1] || null; // 'freetext' or '112' etc.
+
+    // Parse URL command:
+    // - All digits (e.g. "112") → auto-sequence: send option selections
+    // - Anything else (e.g. "Espagne") → send as free text immediately
+    let autoSequence = null;
+    let autoSeqIndex = 0;
+    let autoFreeTextValue = null;
+    if (urlCommand) {
+      if (/^\d+$/.test(urlCommand)) {
+        autoSequence = urlCommand.split('').map(d => parseInt(d) - 1); // '1' → index 0
+      } else {
+        autoFreeTextValue = decodeURIComponent(urlCommand);
+      }
+    }
+
+    if (!assistantId) {
+      document.getElementById('idle').querySelector('p').textContent = 'No assistant ID provided';
+    }
+
+    // Show initial state based on URL command
+    if (autoFreeTextValue || autoSequence) {
+      showState('automode');
+    }
+
+    // Send free text value from URL
+    let autoFreeTextSent = false;
+    function sendAutoFreeText() {
+      if (autoFreeTextSent || !autoFreeTextValue || !assistantId) return;
+      autoFreeTextSent = true;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, { type: 'free_text', value: autoFreeTextValue, timestamp: Date.now() });
+      const freeTextRef = ref(db, `sessions/${assistantId}/freeText`);
+      set(freeTextRef, { text: autoFreeTextValue, timestamp: Date.now() });
+      const el = document.getElementById('autoStatus');
+      el.textContent = `Sent: "${autoFreeTextValue}"`;
+      el.style.color = '#34C759';
+    }
+
+    // Auto-send next selection in sequence
+    function autoSendNext() {
+      if (!autoSequence || autoSeqIndex >= autoSequence.length) return;
+      const idx = autoSequence[autoSeqIndex];
+      autoSeqIndex++;
+      sendSelection(idx);
+      const el = document.getElementById('autoStatus');
+      if (autoSeqIndex >= autoSequence.length) {
+        el.textContent = 'Sequence complete';
+        el.style.color = '#34C759';
+      } else {
+        el.textContent = `Sent ${autoSeqIndex}/${autoSequence.length}...`;
+      }
+    }
+
+    // Clock swipe state
+    let firstSwipe = null;
+    let swipeTimeout = null;
+    const clockMap = {
+      'up,right': 0, 'right,up': 1, 'right,right': 2, 'right,down': 3,
+      'down,right': 4, 'down,down': 5, 'down,left': 6, 'left,down': 7,
+      'left,left': 8, 'left,up': 9, 'up,left': 10, 'up,up': 11,
+      'up,down': 12, 'right,left': 13, 'down,up': 14, 'left,right': 15,
+    };
+
+    let currentSession = null;
+    let tapZoneCount = 0;
+
+    // Show a state, hide others. The decoy view is special — it lives
+    // outside the .state group because it needs a flex column layout.
+    function showState(id) {
+      document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+      const decoyEl = document.getElementById('decoy');
+      if (id === 'decoy') {
+        decoyEl?.classList.add('active');
+      } else {
+        decoyEl?.classList.remove('active');
+        document.getElementById(id)?.classList.add('active');
+      }
+    }
+
+    // Show feedback briefly
+    function showFeedback(text) {
+      const fb = document.getElementById('feedback');
+      fb.textContent = text;
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 500);
+    }
+
+    // Send selection to Firebase
+    function sendSelection(index) {
+      if (!assistantId) return;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, {
+        type: 'selection',
+        value: index,
+        timestamp: Date.now()
+      });
+      showFeedback('Sent!');
+    }
+
+    // Send free text
+    // Send inline free text (alongside buttons)
+    window.sendInlineFreeText = function() {
+      const text = document.getElementById('inlineFreeTextInput').value.trim();
+      if (!text || !assistantId) return;
+      const freeTextRef = ref(db, `sessions/${assistantId}/freeText`);
+      set(freeTextRef, {
+        text: text,
+        timestamp: Date.now()
+      });
+      document.getElementById('inlineFreeTextInput').value = '';
+      showFeedback('Text sent!');
+    };
+
+    // Send standalone free text
+    function renderAcrosticPositionButtons(positions) {
+      const container = document.getElementById('acrosticPositionButtons');
+      container.innerHTML = '';
+      positions.forEach((pos) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = String(pos);
+        btn.onclick = () => sendAcrosticPosition(pos);
+        container.appendChild(btn);
+      });
+    }
+
+    function sendAcrosticPosition(pos) {
+      if (!assistantId) return;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, {
+        type: 'acrostic_position',
+        value: pos,
+        timestamp: Date.now()
+      });
+      showFeedback('Position ' + pos + ' sent');
+    }
+
+    window.sendFreeText = function() {
+      const text = document.getElementById('freeTextInput').value.trim();
+      if (!text || !assistantId) return;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, {
+        type: 'free_text',
+        value: text,
+        timestamp: Date.now()
+      });
+      document.getElementById('freeTextInput').value = '';
+      showFeedback('Sent!');
+      // Redirect if configured
+      if (currentSession && currentSession.redirectUrl) {
+        setTimeout(() => { window.location.href = currentSession.redirectUrl; }, 600);
+      }
+    };
+
+    // Render buttons
+    function renderButtons(session) {
+      const preset = session.currentPreset;
+      document.getElementById('presetName').textContent = preset.slotName
+        ? `${preset.name} — ${preset.slotName}`
+        : preset.name;
+      document.getElementById('roundInfo').textContent =
+        preset.totalRounds > 1 ? `${preset.slotName ? 'Slot' : 'Round'} ${preset.currentRound}/${preset.totalRounds}` : '';
+
+      const grid = document.getElementById('optionsGrid');
+      grid.innerHTML = '';
+      preset.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => sendSelection(i);
+        grid.appendChild(btn);
+      });
+
+      // Show inline free text field if session has it enabled
+      const inlineFT = document.getElementById('inlineFreeText');
+      inlineFT.style.display = session.hasFreeTextField ? 'block' : 'none';
+    }
+
+    // Render chain bar
+    function renderChain(session) {
+      const bar = document.getElementById('chainBar');
+      if (!session.chain || session.chain.length <= 1) {
+        bar.classList.remove('visible');
+        return;
+      }
+      bar.classList.add('visible');
+      bar.innerHTML = '';
+      session.chain.forEach((name, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'chain-sep';
+          sep.textContent = '>';
+          bar.appendChild(sep);
+        }
+        const item = document.createElement('span');
+        item.className = 'chain-item' + (i === (session.chainIndex || 0) ? ' active' : '');
+        item.textContent = name;
+        bar.appendChild(item);
+      });
+    }
+
+    // Setup black screen (tap zones)
+    function setupBlackscreenTap(optionCount) {
+      const el = document.getElementById('blackscreen');
+      tapZoneCount = optionCount;
+      el.onclick = function(e) {
+        const rect = el.getBoundingClientRect();
+        const y = (e.clientY - rect.top) / rect.height;
+        const index = Math.min(Math.floor(y * tapZoneCount), tapZoneCount - 1);
+        sendSelection(index);
+        // Brief flash
+        el.style.background = '#111';
+        setTimeout(() => el.style.background = '#000', 100);
+      };
+    }
+
+    // Setup black screen (swipe)
+    function setupBlackscreenSwipe(optionCount) {
+      const el = document.getElementById('blackscreen');
+      let startX, startY;
+
+      el.ontouchstart = function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      };
+
+      el.ontouchend = function(e) {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return; // too small
+
+        let dir;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          dir = dx > 0 ? 'right' : 'left';
+        } else {
+          dir = dy > 0 ? 'down' : 'up';
+        }
+
+        if (firstSwipe === null) {
+          firstSwipe = dir;
+          // Brief vibration hint
+          el.style.background = '#0a0a0a';
+          setTimeout(() => el.style.background = '#000', 100);
+          clearTimeout(swipeTimeout);
+          swipeTimeout = setTimeout(() => { firstSwipe = null; }, 1500);
+        } else {
+          clearTimeout(swipeTimeout);
+          const key = firstSwipe + ',' + dir;
+          const index = clockMap[key];
+          firstSwipe = null;
+          if (index !== undefined && index < optionCount) {
+            sendSelection(index);
+            el.style.background = '#111';
+            setTimeout(() => el.style.background = '#000', 150);
+          } else {
+            // Invalid
+            el.style.background = '#200';
+            setTimeout(() => el.style.background = '#000', 200);
+          }
+        }
+      };
+    }
+
+    // ===== DECOY MODE =====
+    let decoyState = null; // {imageUrl, inputType, expectedInputs, redirectUrl, lockGesture, showIndicator}
+    let decoyInputCount = 0;
+    let decoyLongPressTimer = null;
+    let decoyLockSent = false;
+    let decoyTouchStart = null;
+    let decoyFinished = false;
+    // Sequence of encoded inputs shown in the hidden footer indicator.
+    // Tap → zone number (1-indexed). Swipe → direction letter (R/L/U/D).
+    // Lock → "L". Cleared on each new decoy session.
+    let decoyEncodedTokens = [];
+
+    function renderDecoyEncoded() {
+      const el = document.getElementById('decRevealText');
+      if (!el) return;
+      const txt = decoyEncodedTokens.join(' ');
+      el.textContent = txt.length > 0 ? txt : '—';
+    }
+
+    function pushDecoyToken(tok, opts) {
+      decoyEncodedTokens.push(tok);
+      renderDecoyEncoded();
+      // Also flash the latest token in the corner indicator. Skip when the
+      // caller has already triggered a custom pulse (e.g. lock).
+      if (!opts || !opts.skipPulse) {
+        pulseDecoyIndicator(opts && opts.locked === true, tok);
+      }
+    }
+    /// Last redirect URL we set up (kept around so idle-after-decoy can navigate
+    /// the spectator away even when expectedInputs sentinel was high).
+    let decoyLastRedirect = null;
+
+    function pulseDecoyIndicator(locked, label) {
+      if (!decoyState || decoyState.showIndicator === false) return;
+      const dot = document.getElementById('decoyDot');
+      if (!dot) return;
+      if (label != null) dot.textContent = label;
+      if (locked) dot.classList.add('locked');
+      dot.classList.add('pulse');
+      // Drop .pulse after 500ms so the CSS transition fades the colour out.
+      setTimeout(() => dot.classList.remove('pulse'), 500);
+    }
+
+    function sendDecoyInput(value) {
+      if (!assistantId || decoyFinished) return;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, {
+        type: 'selection',
+        value: value,
+        timestamp: Date.now(),
+      });
+      decoyInputCount++;
+      // The visual flash is triggered by pushDecoyToken at the call site —
+      // no extra pulse needed here.
+      // Subtle haptic on supporting devices (no visual reveal).
+      if (navigator.vibrate) navigator.vibrate(15);
+
+      if (decoyState && decoyInputCount >= decoyState.expectedInputs) {
+        decoyFinished = true;
+        const redirect = decoyState.redirectUrl;
+        if (redirect) setTimeout(() => { window.location.href = redirect; }, 350);
+      }
+    }
+
+    function sendDecoyLock() {
+      if (!assistantId || decoyLockSent || decoyFinished) return;
+      decoyLockSent = true;
+      const inputRef = ref(db, `sessions/${assistantId}/input`);
+      set(inputRef, {
+        type: 'lock',
+        timestamp: Date.now(),
+      });
+      pushDecoyToken('■', { locked: true });
+      if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+      // Redirect after lock — the lock IS the final input for FW-style
+      // sessions (expectedInputs sentinel = 999). Doing it here as well as
+      // on the app's idle signal makes the redirect resilient if the app
+      // misses the clear-session step.
+      if (decoyState) {
+        const redirect = decoyState.redirectUrl;
+        if (redirect) {
+          decoyFinished = true;
+          setTimeout(() => { window.location.href = redirect; }, 500);
+        }
+      }
+    }
+
+    function setupDecoy(decoy) {
+      decoyState = decoy;
+      decoyInputCount = 0;
+      decoyLockSent = false;
+      decoyFinished = false;
+      decoyLastRedirect = decoy.redirectUrl || null;
+      decoyEncodedTokens = [];
+      renderDecoyEncoded();
+
+      // Render template (favicon, title, image, thumbnails, copyright).
+      const tpl = decoy.template || {};
+      const fav = document.getElementById('decFavicon');
+      // Favicon: image takes precedence; fall back to text+colors.
+      if (tpl.faviconImageUrl && tpl.faviconImageUrl.trim() !== '') {
+        fav.innerHTML = '';
+        const imgEl = document.createElement('img');
+        imgEl.src = tpl.faviconImageUrl;
+        imgEl.referrerPolicy = 'no-referrer';
+        fav.appendChild(imgEl);
+        fav.style.background = 'transparent';
+      } else {
+        fav.innerHTML = '';
+        fav.textContent = (tpl.faviconText || 'G').slice(0, 4);
+        fav.style.background = tpl.faviconBgColor || '#1a73e8';
+        fav.style.color = tpl.faviconTextColor || '#ffffff';
+      }
+      document.getElementById('decSiteName').textContent = tpl.siteName || '';
+      document.getElementById('decTitle').textContent = tpl.title || '';
+      document.getElementById('decCopyright').innerHTML =
+        (tpl.copyright || 'Images may be subject to copyright. Learn More')
+          .replace(/(Learn More|En savoir plus|Saber más)/i, '<b>$1</b>');
+      const img = document.getElementById('decoyImg');
+      img.src = tpl.mainImageUrl || '';
+      // Carousel
+      const carousel = document.getElementById('decCarousel');
+      carousel.innerHTML = '';
+      const thumbs = Array.isArray(tpl.thumbnailUrls) ? tpl.thumbnailUrls : [];
+      thumbs.forEach(url => {
+        if (!url) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'dec-thumb';
+        const t = document.createElement('img');
+        t.src = url;
+        t.referrerPolicy = 'no-referrer';
+        wrap.appendChild(t);
+        carousel.appendChild(wrap);
+      });
+
+      // Indicator visibility
+      const dot = document.getElementById('decoyDot');
+      dot.style.display = decoy.showIndicator === false ? 'none' : 'block';
+      dot.classList.remove('pulse', 'locked');
+      dot.textContent = '';
+
+      // Long-press reveal of the encoded summary — anywhere in the static
+      // footer triggers the overlay after 400 ms; release hides it. The
+      // image area is excluded so taps stay snappy and unconfused.
+      const reveal = document.getElementById('decReveal');
+      const footer = document.querySelector('.dec-footer');
+      let revealTimer = null;
+      const showReveal = () => { renderDecoyEncoded(); reveal.classList.add('visible'); };
+      const hideReveal = () => { reveal.classList.remove('visible'); };
+      const cancelReveal = () => { clearTimeout(revealTimer); revealTimer = null; hideReveal(); };
+      footer.ontouchstart = (e) => {
+        clearTimeout(revealTimer);
+        revealTimer = setTimeout(showReveal, 400);
+      };
+      footer.ontouchend = footer.ontouchcancel = (e) => { cancelReveal(); };
+      footer.onmousedown = (e) => {
+        clearTimeout(revealTimer);
+        revealTimer = setTimeout(showReveal, 400);
+      };
+      footer.onmouseup = footer.onmouseleave = (e) => { cancelReveal(); };
+      // Reset reveal state on each new session.
+      hideReveal();
+
+      // Bind gesture handlers on the transparent overlay only.
+      const overlay = document.getElementById('decOverlay');
+      overlay.ontouchstart = overlay.ontouchend = overlay.ontouchmove = overlay.onclick = null;
+      overlay.onmousedown = overlay.onmouseup = null;
+
+      const inputType = decoy.inputType || 'tap';
+
+      // Compute the zone layout for tap mode and render the matching tick
+      // marks on the image edges. Layouts:
+      //   1-3 zones  → horizontal bands (row-only ticks on the left edge)
+      //   4 zones    → 2 cols × 2 rows (1 col tick + 1 row tick)
+      //   5 zones    → 2 cols × 3 rows; bottom row is a single full-width
+      //                cell for zone 5 (1 col tick + 2 row ticks)
+      //   6 zones    → 2 cols × 3 rows (1 col tick + 2 row ticks)
+      // Skipped entirely for swipe mode.
+      const ticks = document.getElementById('decZoneTicks');
+      ticks.innerHTML = '';
+      let zoneLayout = null;
+      if (inputType === 'tap' || inputType === 'tap_zones') {
+        const zones = Math.max(1, decoy.optionCount || (inputType === 'tap_zones' ? decoy.expectedInputs : 1));
+        if (zones <= 3) {
+          zoneLayout = { kind: 'rows', cols: 1, rows: zones };
+        } else if (zones === 4) {
+          zoneLayout = { kind: 'grid', cols: 2, rows: 2 };
+        } else if (zones === 5) {
+          zoneLayout = { kind: 'grid5', cols: 2, rows: 3 };
+        } else {
+          zoneLayout = { kind: 'grid', cols: 2, rows: 3 };
+        }
+        const addTick = (cls, posPct) => {
+          const t = document.createElement('div');
+          t.className = 'dec-zone-tick ' + cls;
+          if (cls === 'row') t.style.top = posPct + '%';
+          else t.style.left = posPct + '%';
+          ticks.appendChild(t);
+        };
+        for (let r = 1; r < zoneLayout.rows; r++) addTick('row', r * 100 / zoneLayout.rows);
+        for (let c = 1; c < zoneLayout.cols; c++) addTick('col', c * 100 / zoneLayout.cols);
+      }
+
+      if (inputType === 'tap' || inputType === 'tap_zones') {
+        const zoneCount = Math.max(1, decoy.optionCount || (inputType === 'tap_zones' ? decoy.expectedInputs : 1));
+        // Compute the zone index from a (clientX, clientY) point.
+        function zoneIdxAt(clientX, clientY) {
+          const rect = overlay.getBoundingClientRect();
+          const xN = (clientX - rect.left) / rect.width;
+          const yN = (clientY - rect.top) / rect.height;
+          if (!zoneLayout || zoneLayout.kind === 'rows') {
+            return Math.min(Math.floor(yN * zoneCount), zoneCount - 1);
+          } else if (zoneLayout.kind === 'grid5') {
+            const row = Math.min(Math.floor(yN * 3), 2);
+            if (row === 2) return 4; // bottom row spans both cols
+            const col = Math.min(Math.floor(xN * 2), 1);
+            return row * 2 + col;
+          } else {
+            const row = Math.min(Math.floor(yN * zoneLayout.rows), zoneLayout.rows - 1);
+            const col = Math.min(Math.floor(xN * zoneLayout.cols), zoneLayout.cols - 1);
+            return row * zoneLayout.cols + col;
+          }
+        }
+
+        function startPress(x, y) {
+          if (decoy.lockGesture && !decoyLockSent) {
+            clearTimeout(decoyLongPressTimer);
+            decoyLongPressTimer = setTimeout(() => {
+              sendDecoyLock();
+              decoyTouchStart = null;
+            }, 1000);
+          }
+          decoyTouchStart = { x: x, y: y, t: Date.now() };
+        }
+        function endPress(x, y) {
+          clearTimeout(decoyLongPressTimer);
+          if (!decoyTouchStart) return;
+          const dt = Date.now() - decoyTouchStart.t;
+          decoyTouchStart = null;
+          if (decoy.lockGesture && dt >= 1000) return;
+          const idx = zoneIdxAt(x, y);
+          pushDecoyToken(String(idx + 1));
+          sendDecoyInput(idx);
+        }
+
+        overlay.ontouchstart = function(e) {
+          const t = e.touches[0];
+          startPress(t.clientX, t.clientY);
+        };
+        overlay.ontouchend = function(e) {
+          const t = e.changedTouches[0];
+          endPress(t.clientX, t.clientY);
+        };
+        // Mouse fallback for desktop browsers (Chrome/Firefox/Edge) where
+        // pointer-style touches are absent. Suppressed when a touch sequence
+        // just fired (handled via decoyTouchStart having been cleared).
+        let mouseActive = false;
+        overlay.onmousedown = function(e) {
+          mouseActive = true;
+          startPress(e.clientX, e.clientY);
+        };
+        overlay.onmouseup = function(e) {
+          if (!mouseActive) return;
+          mouseActive = false;
+          endPress(e.clientX, e.clientY);
+        };
+        return;
+      }
+
+      if (inputType === 'swipe') {
+        let startX, startY;
+        overlay.ontouchstart = function(e) {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          if (decoy.lockGesture && !decoyLockSent) {
+            clearTimeout(decoyLongPressTimer);
+            decoyLongPressTimer = setTimeout(() => sendDecoyLock(), 1000);
+          }
+        };
+        overlay.ontouchend = function(e) {
+          clearTimeout(decoyLongPressTimer);
+          const dx = e.changedTouches[0].clientX - startX;
+          const dy = e.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
+          let dir;
+          if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left';
+          else dir = dy > 0 ? 'down' : 'up';
+          pushDecoyToken(dir.charAt(0).toUpperCase());
+
+          if (firstSwipe === null) {
+            firstSwipe = dir;
+            // pushDecoyToken (above) already flashed the indicator with the
+            // direction letter — no extra pulse needed.
+            clearTimeout(swipeTimeout);
+            swipeTimeout = setTimeout(() => { firstSwipe = null; }, 1500);
+          } else {
+            clearTimeout(swipeTimeout);
+            const key = firstSwipe + ',' + dir;
+            const idx = clockMap[key];
+            firstSwipe = null;
+            if (idx !== undefined) sendDecoyInput(idx);
+          }
+        };
+        return;
+      }
+    }
+
+    // Listen for session changes
+    if (assistantId) {
+      const sessionRef = ref(db, `sessions/${assistantId}`);
+      onValue(sessionRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data || data.state === 'idle') {
+          // Coming back to idle from a decoy session means the app side has
+          // finalised (e.g. Free Will lock). Redirect the spectator now —
+          // they'd otherwise stay on the image with no inputs accepted.
+          if (decoyState && !decoyFinished) {
+            decoyFinished = true;
+            const redirect = decoyLastRedirect || decoyState.redirectUrl;
+            if (redirect) {
+              setTimeout(() => { window.location.href = redirect; }, 200);
+              return;
+            }
+          }
+          if (autoSequence || autoFreeTextValue) {
+            showState('automode');
+          } else {
+            showState('idle');
+          }
+          currentSession = null;
+          decoyState = null;
+          return;
+        }
+
+        currentSession = data;
+        renderChain(data);
+
+        if (data.state === 'free_text') {
+          if (autoFreeTextValue) {
+            setTimeout(() => sendAutoFreeText(), 300);
+            return;
+          }
+          showState('freetext');
+          return;
+        }
+
+        if (data.state === 'acrostic_position_pick') {
+          renderAcrosticPositionButtons(data.availablePositions || [1,2,3,4,5,6]);
+          showState('acrosticPosition');
+          return;
+        }
+
+        if (data.state === 'decoy' && data.decoy) {
+          setupDecoy(data.decoy);
+          showState('decoy');
+          return;
+        }
+
+        if (data.state === 'active' && data.currentPreset) {
+          // Auto-sequence mode: send next selection automatically
+          if (autoSequence && autoSeqIndex < autoSequence.length) {
+            showState('automode');
+            setTimeout(() => autoSendNext(), 300);
+            return;
+          }
+
+          // Auto free text: send immediately when session is active
+          if (autoFreeTextValue && !autoFreeTextSent) {
+            sendAutoFreeText();
+            return;
+          }
+
+          const mode = data.currentPreset.inputMode || 'buttons';
+
+          if (mode === 'buttons') {
+            renderButtons(data);
+            showState('buttons');
+          } else if (mode === 'blackscreen_tap') {
+            setupBlackscreenTap(data.currentPreset.options.length);
+            showState('blackscreen');
+          } else if (mode === 'blackscreen_swipe') {
+            setupBlackscreenSwipe(data.currentPreset.options.length);
+            showState('blackscreen');
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

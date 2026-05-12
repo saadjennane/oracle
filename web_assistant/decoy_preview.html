@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Decoy templates preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { background: #000; color: #e3e3e3; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; height: 100%; }
+    body { display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Preview switcher (only visible in preview mode, not in production) ── */
+    .switcher {
+      position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+      z-index: 1000; display: flex; gap: 6px;
+      background: rgba(0,0,0,0.7); border-radius: 20px; padding: 5px;
+      backdrop-filter: blur(8px);
+    }
+    .switcher button {
+      background: transparent; color: #fff; border: 0; padding: 6px 14px;
+      font-size: 12px; border-radius: 14px; cursor: pointer;
+      font-family: inherit; font-weight: 500;
+    }
+    .switcher button.active { background: #1f1f1f; }
+
+    /* ── Common Google Image Lightbox layout ── */
+    .lightbox { width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+    /* App bar */
+    .appbar {
+      flex: 0 0 auto;
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      background: #000;
+    }
+    .favicon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: #000;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .favicon img { width: 100%; height: 100%; object-fit: cover; }
+    .site-name { flex: 1; font-size: 18px; font-weight: 500; color: #e3e3e3; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #e3e3e3; font-size: 22px; line-height: 1; cursor: pointer;
+    }
+
+    /* Main image area */
+    .image-area {
+      flex: 1 1 auto;
+      display: flex; align-items: center; justify-content: center;
+      background: #000;
+      padding: 16px 20px;
+      min-height: 0;
+      position: relative;
+    }
+    .image-area img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 6px;
+      pointer-events: none; -webkit-user-drag: none; user-select: none;
+    }
+    .lens-icon {
+      position: absolute; left: 16px; bottom: 16px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    /* Footer block */
+    .footer {
+      flex: 0 0 auto;
+      background: #1f1f1f;
+      padding: 14px 16px 8px;
+      border-radius: 16px 16px 0 0;
+    }
+    .title-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 6px;
+    }
+    .title-text {
+      flex: 1;
+      font-size: 16px; font-weight: 500;
+      color: #e3e3e3;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .visit-btn {
+      flex-shrink: 0;
+      background: #a8c7fa; color: #062e6f;
+      padding: 8px 18px; border-radius: 20px;
+      font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 4px;
+      cursor: pointer;
+    }
+    .visit-btn::after { content: '›'; font-size: 18px; line-height: 1; }
+    .copyright {
+      font-size: 11px; color: #9aa0a6; margin-bottom: 12px;
+    }
+    .copyright b { color: #e3e3e3; font-weight: 500; }
+
+    .actions { display: flex; gap: 8px; margin-bottom: 14px; }
+    .action-btn {
+      flex: 1;
+      background: #2d2d2d; color: #e3e3e3;
+      border-radius: 22px; padding: 10px 16px;
+      font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer;
+    }
+
+    .carousel {
+      display: flex; gap: 6px; overflow: hidden;
+      padding-bottom: 4px;
+    }
+    .thumb {
+      flex-shrink: 0;
+      width: 78px; height: 78px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #2d2d2d;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Pagination dots */
+    .dots {
+      display: flex; justify-content: center; gap: 4px;
+      padding: 6px 0 8px;
+    }
+    .dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #5f6368;
+    }
+    .dots span.active { background: #e3e3e3; width: 18px; border-radius: 3px; }
+
+    /* Tap/swipe overlay (transparent, captures gestures) */
+    .gesture-overlay {
+      position: absolute; inset: 0;
+      background: transparent;
+      touch-action: none;
+    }
+
+    /* Indicator dot (matches main webapp) */
+    .indicator {
+      position: fixed; right: 10px; bottom: 10px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,0); pointer-events: none;
+      transition: background 120ms, transform 120ms;
+      z-index: 999;
+    }
+    .indicator.pulse { background: rgba(255,255,255,0.55); transform: scale(1.4); }
+
+    /* Hide template not active */
+    .lightbox { display: none; }
+    .lightbox.active { display: flex; }
+  </style>
+</head>
+<body>
+  <div class="switcher">
+    <button data-tpl="paris" class="active">Paris</button>
+    <button data-tpl="tomcruise">Tom Cruise</button>
+    <button data-tpl="spiral">Spirale</button>
+  </div>
+
+  <!-- ── PARIS ── -->
+  <div class="lightbox active" id="tpl-paris">
+    <div class="appbar">
+      <div class="favicon" style="background:#0085ca; color:#fff;">P</div>
+      <div class="site-name">paris.fr</div>
+      <div class="icon-btn">⋮</div>
+      <div class="icon-btn">×</div>
+    </div>
+    <div class="image-area">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg/600px-Tour_Eiffel_Wikimedia_Commons.jpg" alt="Eiffel Tower" referrerpolicy="no-referrer">
+      <div class="lens-icon">📷</div>
+      <div class="gesture-overlay"></div>
+    </div>
+    <div class="footer">
+      <div class="title-row">
+        <div class="title-text">Tour Eiffel - Paris.fr</div>
+        <div class="visit-btn">Visit</div>
+      </div>
+      <div class="copyright">Images may be subject to copyright. <b>Learn More</b></div>
+      <div class="actions">
+        <div class="action-btn">↗ Share</div>
+        <div class="action-btn">🔖 Save</div>
+      </div>
+      <div class="carousel">
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg/200px-Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/200px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Vue_a%C3%A9rienne_du_domaine_de_Versailles_par_ToucanWings_-_Creative_Commons_By_Sa_3.0_-_073.jpg/200px-Vue_a%C3%A9rienne_du_domaine_de_Versailles_par_ToucanWings_-_Creative_Commons_By_Sa_3.0_-_073.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Paris_Night.jpg/200px-Paris_Night.jpg" referrerpolicy="no-referrer"></div>
+      </div>
+      <div class="dots"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <!-- ── TOM CRUISE ── -->
+  <div class="lightbox" id="tpl-tomcruise">
+    <div class="appbar">
+      <div class="favicon" style="background:#f5c518; color:#000;">IMDb</div>
+      <div class="site-name">IMDb</div>
+      <div class="icon-btn">⋮</div>
+      <div class="icon-btn">×</div>
+    </div>
+    <div class="image-area">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tom_Cruise_by_Gage_Skidmore_2.jpg/600px-Tom_Cruise_by_Gage_Skidmore_2.jpg" alt="Tom Cruise" referrerpolicy="no-referrer">
+      <div class="lens-icon">📷</div>
+      <div class="gesture-overlay"></div>
+    </div>
+    <div class="footer">
+      <div class="title-row">
+        <div class="title-text">Tom Cruise - IMDb</div>
+        <div class="visit-btn">Visit</div>
+      </div>
+      <div class="copyright">Images may be subject to copyright. <b>Learn More</b></div>
+      <div class="actions">
+        <div class="action-btn">↗ Share</div>
+        <div class="action-btn">🔖 Save</div>
+      </div>
+      <div class="carousel">
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tom_Cruise_by_Gage_Skidmore_2.jpg/200px-Tom_Cruise_by_Gage_Skidmore_2.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Tom_Cruise_avp_2014_4.jpg/200px-Tom_Cruise_avp_2014_4.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Tom_Cruise_Cannes.jpg/200px-Tom_Cruise_Cannes.jpg" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Tom_Cruise_by_Gage_Skidmore_2.jpg/200px-Tom_Cruise_by_Gage_Skidmore_2.jpg" referrerpolicy="no-referrer"></div>
+      </div>
+      <div class="dots"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <!-- ── HYPNOTIC SPIRAL ── -->
+  <div class="lightbox" id="tpl-spiral">
+    <div class="appbar">
+      <div class="favicon" style="background:#fff; color:#202122; font-size:11px;">W</div>
+      <div class="site-name">Wikipedia</div>
+      <div class="icon-btn">⋮</div>
+      <div class="icon-btn">×</div>
+    </div>
+    <div class="image-area">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Hypnotic_spiral.svg/600px-Hypnotic_spiral.svg.png" alt="Hypnotic spiral" referrerpolicy="no-referrer">
+      <div class="lens-icon">📷</div>
+      <div class="gesture-overlay"></div>
+    </div>
+    <div class="footer">
+      <div class="title-row">
+        <div class="title-text">Hypnotic spiral - Wikipedia</div>
+        <div class="visit-btn">Visit</div>
+      </div>
+      <div class="copyright">Images may be subject to copyright. <b>Learn More</b></div>
+      <div class="actions">
+        <div class="action-btn">↗ Share</div>
+        <div class="action-btn">🔖 Save</div>
+      </div>
+      <div class="carousel">
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Hypnotic_spiral.svg/200px-Hypnotic_spiral.svg.png" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Spiral_animation.gif/200px-Spiral_animation.gif" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Logarithmic_Spiral_Pylab.svg/200px-Logarithmic_Spiral_Pylab.svg.png" referrerpolicy="no-referrer"></div>
+        <div class="thumb"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Fibonacci_spiral_34.svg/200px-Fibonacci_spiral_34.svg.png" referrerpolicy="no-referrer"></div>
+      </div>
+      <div class="dots"><span class="active"></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <div class="indicator" id="indicator"></div>
+
+  <script>
+    // Switcher
+    document.querySelectorAll('.switcher button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.lightbox').forEach(l => l.classList.remove('active'));
+        document.getElementById('tpl-' + btn.dataset.tpl).classList.add('active');
+      });
+    });
+
+    // Demo gesture capture: pulse the indicator on tap/swipe inside any image area
+    function pulse() {
+      const dot = document.getElementById('indicator');
+      dot.classList.add('pulse');
+      setTimeout(() => dot.classList.remove('pulse'), 220);
+      if (navigator.vibrate) navigator.vibrate(15);
+    }
+    document.querySelectorAll('.gesture-overlay').forEach(el => {
+      let startX, startY;
+      el.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      });
+      el.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        // Tap or swipe — both demo a pulse
+        pulse();
+      });
+      el.addEventListener('click', pulse); // desktop preview
+    });
+  </script>
+</body>
+</html>

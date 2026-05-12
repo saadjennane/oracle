@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AS Magic Apps</title>
+  <meta name="description" content="Tools for serious mentalists and magicians. Built by performers, for performers." />
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --surface: #131419;
+      --surface-2: #1a1c24;
+      --border: #2a2d38;
+      --text: #ececf1;
+      --muted: #8e93a3;
+      --accent: #c8a96a;
+      --accent-2: #8b7350;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', sans-serif; line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    body {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 24px;
+      position: relative; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(200, 169, 106, 0.10) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    a { color: var(--accent); text-decoration: none; }
+
+    .wrap { max-width: 760px; width: 100%; text-align: center; position: relative; z-index: 1; }
+
+    .brand-mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px; font-weight: 500; letter-spacing: 4px; color: var(--muted); text-transform: uppercase; margin-bottom: 60px; }
+    .brand-mark .dot { color: var(--accent); }
+
+    h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(40px, 7vw, 64px); font-weight: 600; line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 16px; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .tagline { color: var(--muted); font-size: 17px; max-width: 540px; margin: 0 auto 64px; }
+
+    .apps { display: grid; gap: 18px; margin-bottom: 56px; }
+    .app-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 28px;
+      display: flex; align-items: center; gap: 22px;
+      text-align: left;
+      transition: border-color 200ms, transform 200ms;
+    }
+    .app-card:hover { border-color: var(--accent-2); transform: translateY(-2px); }
+    .app-card img { width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; }
+    .app-card .meta { flex: 1; min-width: 0; }
+    .app-card .meta h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .app-card .meta p { color: var(--muted); font-size: 14px; }
+    .app-card .cta { flex-shrink: 0; background: var(--accent); color: #1a1300; padding: 11px 22px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: background 120ms; white-space: nowrap; }
+    .app-card .cta:hover { background: #d6b87a; }
+
+    .coming { color: var(--muted); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; }
+
+    footer { margin-top: 80px; color: var(--muted); font-size: 12px; opacity: 0.6; }
+
+    @media (max-width: 640px) {
+      .app-card { flex-direction: column; align-items: flex-start; text-align: left; padding: 24px; gap: 16px; }
+      .app-card .cta { align-self: stretch; text-align: center; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrap">
+  <div class="brand-mark">AS Magic Apps<span class="dot">.</span></div>
+
+  <h1>Tools for <em>serious</em> mentalists.</h1>
+  <p class="tagline">Built by performers, for performers. A small studio focused on apps that hold up to examination.</p>
+
+  <div class="apps">
+    <a class="app-card" href="https://oracle.asmagicapps.com">
+      <img src="oracle-logo.png" alt="Oracle logo" />
+      <div class="meta">
+        <h2>Oracle</h2>
+        <p>Predictions that survive any outcome. Revealed in the real iOS Notes app.</p>
+      </div>
+      <span class="cta">Discover →</span>
+    </a>
+  </div>
+
+  <div class="coming">More apps coming soon</div>
+
+  <footer>© 2026 AS Magic Apps</footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1213 @@
+{
+  "schemaVersion": "2.0",
+  "scope": {
+    "gameTypes": ["choices"],
+    "modes": ["GAME", "DIRECT"]
+  },
+  "placeholders": [
+    "{SPECT_SEQ}",
+    "{PERF_SEQ}",
+    "{DOM}",
+    "{STREAK}",
+    "{SWITCH}",
+    "{MISS_ROUNDS}",
+    "{HITS}",
+    "{MISSES}",
+    "{ROUNDS}"
+  ],
+  "languages": {
+    "fr": {
+      "limits": {
+        "direct": { "minWords": 35, "maxWords": 85 },
+        "psychologique": { "minWords": 55, "maxWords": 110 },
+        "narratif": { "minWords": 55, "maxWords": 115 },
+        "carnet": { "minWords": 20, "maxWords": 60 }
+      },
+      "narrativeHooks": {
+        "reve": {
+          "future": {
+            "neutral": ["Cette nuit, j'ai rêvé d'une suite très simple : {SPECT_SEQ}."],
+            "confident": ["Cette nuit, c'était clair : tu vas faire {SPECT_SEQ}."],
+            "humor": ["J'ai rêvé de toi… et de {SPECT_SEQ}. Oui, ça compte comme un signe."],
+            "taquin": ["J'ai rêvé de {SPECT_SEQ}. Tu vas encore faire ça, avoue."]
+          },
+          "present": {
+            "neutral": ["Je repense à un rêve court : {SPECT_SEQ}."],
+            "confident": ["Je le revois : {SPECT_SEQ}. C'est net."],
+            "humor": ["Je revois mon rêve : {SPECT_SEQ}. Pas très original, mais efficace."],
+            "taquin": ["Je revois le truc : {SPECT_SEQ}. Tu vas le faire, évidemment."]
+          },
+          "past": {
+            "neutral": ["Cette nuit, j'avais noté mentalement : {SPECT_SEQ}."],
+            "confident": ["Cette nuit, j'étais sûr : {SPECT_SEQ}."],
+            "humor": ["Cette nuit, j'ai fait le rêve le plus utile : {SPECT_SEQ}."],
+            "taquin": ["Cette nuit, j'avais déjà vu {SPECT_SEQ}. Tu es prévisible (gentiment)."]
+          }
+        },
+        "intuition": {
+          "future": {
+            "neutral": ["J'ai une intuition : tu vas faire {SPECT_SEQ}."],
+            "confident": ["Je le sens : tu vas faire {SPECT_SEQ}."],
+            "humor": ["J'ai une intuition. Et elle est têtue : {SPECT_SEQ}."],
+            "taquin": ["J'ai une intuition : tu vas tenter {SPECT_SEQ}. Bien tenté."]
+          },
+          "present": {
+            "neutral": ["Là, j'ai une intuition nette : {SPECT_SEQ}."],
+            "confident": ["Je le sens maintenant : {SPECT_SEQ}."],
+            "humor": ["Mon intuition vient d'arriver… avec {SPECT_SEQ} sous le bras."],
+            "taquin": ["Je te regarde et je le sens : {SPECT_SEQ}. Classique."]
+          },
+          "past": {
+            "neutral": ["J'avais une intuition : {SPECT_SEQ}."],
+            "confident": ["Je l'avais senti : {SPECT_SEQ}."],
+            "humor": ["J'avais une intuition… pour une fois, elle sert : {SPECT_SEQ}."],
+            "taquin": ["Je l'avais senti venir : {SPECT_SEQ}. Tu n'allais pas y échapper."]
+          }
+        },
+        "premonition": {
+          "future": {
+            "neutral": ["Je te le dis avant : tu vas faire {SPECT_SEQ}."],
+            "confident": ["Je te le dis avant : {SPECT_SEQ}. Sans hésiter."],
+            "humor": ["Je te le dis avant… comme ça tu ne diras pas que je triche : {SPECT_SEQ}."],
+            "taquin": ["Je te le dis avant : {SPECT_SEQ}. Tu vas essayer de me piéger, je sais."]
+          },
+          "present": {
+            "neutral": ["Je le sens là : {SPECT_SEQ}."],
+            "confident": ["C'est maintenant évident : {SPECT_SEQ}."],
+            "humor": ["Je le sens là… et ça sent {SPECT_SEQ}."],
+            "taquin": ["Je le sens : {SPECT_SEQ}. Tu vas faire ton petit plan."]
+          },
+          "past": {
+            "neutral": ["Je l'avais senti : {SPECT_SEQ}."],
+            "confident": ["Je le savais déjà : {SPECT_SEQ}."],
+            "humor": ["Je l'avais senti. Et franchement, c'est pratique : {SPECT_SEQ}."],
+            "taquin": ["Je le savais déjà : {SPECT_SEQ}. Tu es fidèle à toi-même."]
+          }
+        },
+        "hasard": {
+          "future": {
+            "neutral": ["On va dire \"au hasard\"… mais tu vas faire {SPECT_SEQ}."],
+            "confident": ["\"Au hasard\", oui. Et pourtant : {SPECT_SEQ}."],
+            "humor": ["\"Au hasard\"… bien sûr. Et tu vas faire {SPECT_SEQ}."],
+            "taquin": ["\"Au hasard\". Et toi, tu vas quand même faire {SPECT_SEQ}. Classique."]
+          },
+          "present": {
+            "neutral": ["On dit \"au hasard\". Pourtant, ça dessine {SPECT_SEQ}."],
+            "confident": ["On dit \"au hasard\". Moi je vois {SPECT_SEQ}."],
+            "humor": ["\"Au hasard\"… et pourtant voilà {SPECT_SEQ}."],
+            "taquin": ["\"Au hasard\"… oui oui. Et ça fait {SPECT_SEQ}."]
+          },
+          "past": {
+            "neutral": ["On a dit \"au hasard\". Ça a fait {SPECT_SEQ}."],
+            "confident": ["On a dit \"au hasard\". Ça a fait {SPECT_SEQ}. Évidemment."],
+            "humor": ["On a dit \"au hasard\". Résultat : {SPECT_SEQ}. Merci le hasard."],
+            "taquin": ["On a dit \"au hasard\". Résultat : {SPECT_SEQ}. Tu m'as pas eu."]
+          }
+        }
+      },
+      "styles": {
+        "direct": {
+          "future": {
+            "neutral": {
+              "hooks": ["Prédiction : tu vas faire {SPECT_SEQ}.", "Tu vas faire {SPECT_SEQ}."],
+              "performerLines": ["Moi, je vais écrire {PERF_SEQ}.", "De mon côté : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas rester sur {DOM}. {STREAK}.", "Tu vas t'installer sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu vas changer {SWITCH}. Juste pour brouiller.", "Tu vas faire un petit changement {SWITCH}."],
+                "alternating": ["Tu vas changer pour me brouiller. Ça se voit.", "Tu vas alterner pour que ça fasse \"hasard\"."],
+                "mixed": ["Tu vas varier juste assez pour y croire.", "Tu vas bouger un peu… mais pas tant que ça."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu vas vouloir me tester en restant simple. Classique.", "Tu vas essayer de m'avoir en restant sur {DOM}. Bien tenté."],
+                "alternating": ["Tu vas essayer de me perdre en changeant. Bien tenté.", "Tu vas croire que le changement me gêne. Pas vraiment."]
+              },
+              "missLines": {
+                "oneMiss": ["Si je \"rate\" {MISS_ROUNDS}, c'est voulu. Juste pour que ça paraisse réel."],
+                "twoMiss": ["Je vais te laisser {MISSES} fois. Pour te donner l'illusion que tu m'as."],
+                "allMiss": ["Je vais te laisser passer exprès. Sinon c'est trop parfait."],
+                "generic": ["Et si je me \"trompe\", c'est joué. Toujours."]
+              },
+              "closers": ["Voilà.", "On y va.", "C'est tout."]
+            },
+            "confident": {
+              "hooks": ["Je te le dis : tu vas faire {SPECT_SEQ}.", "Tu vas faire {SPECT_SEQ}. Sans surprise."],
+              "performerLines": ["Je vais écrire {PERF_SEQ}. Et je vais m'y tenir."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas imposer {DOM}. {STREAK}. C'est ton réflexe."],
+                "oneSwitch": ["Tu vas changer {SWITCH}, mais tu reviendras à l'essentiel."],
+                "alternating": ["Tu vas changer pour brouiller. Ça ne suffira pas."],
+                "mixed": ["Tu vas varier, mais le schéma reste visible."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu vas me \"tester\". Et tu vas te trahir par la constance."],
+                "alternating": ["Tu vas vouloir me piéger en variant. Je t'attends."]
+              },
+              "missLines": {
+                "oneMiss": ["Le seul \"raté\" ({MISS_ROUNDS}) est volontaire. Je contrôle le rythme."],
+                "twoMiss": ["Je te laisse {MISSES} fois, volontairement. C'est la mise en scène."],
+                "allMiss": ["Je te laisse tout, exprès. Je veux que tu y crois."],
+                "generic": ["Mes \"ratés\" sont choisis. Pas subis."]
+              },
+              "closers": ["Comme prévu.", "Exactement.", "On continue."]
+            },
+            "humor": {
+              "hooks": ["Ok. Tu vas faire {SPECT_SEQ}. (Oui, je prends des notes.)", "Tu vas faire {SPECT_SEQ}. Je tente un truc."],
+              "performerLines": ["Moi je mets {PERF_SEQ}. Et si je rate, on dira que c'était du théâtre."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. On aime le confort.", "Tu t'installes sur {DOM}. {STREAK}. Tranquille."],
+                "oneSwitch": ["Tu changes {SWITCH}. Pour faire genre.", "Tu fais un petit switch {SWITCH}. Joli."],
+                "alternating": ["Tu changes pour me perdre. Joli essai.", "Tu varies pour faire \"hasard\". Merci."],
+                "mixed": ["Tu varies juste assez pour y croire. Je vois le plan."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu veux me piéger en restant simple. Ça se tente.", "Tu veux me tester. Je comprends."],
+                "alternating": ["Tu veux me brouiller. Bien joué. Presque."]
+              },
+              "missLines": {
+                "oneMiss": ["Je \"rate\" {MISS_ROUNDS} exprès. Sinon tu vas dire que je suis chiant."],
+                "twoMiss": ["Je te laisse {MISSES} fois. Juste pour que tu souries."],
+                "allMiss": ["Je te laisse tout exprès. Pour que tu prennes confiance."],
+                "generic": ["Si je rate, c'est volontaire. Promis."]
+              },
+              "closers": ["Vas-y.", "On teste.", "Go."]
+            },
+            "taquin": {
+              "hooks": ["Ok. Tu vas faire {SPECT_SEQ}.", "Je parie que tu vas faire {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Classique.", "Toujours {DOM}. {STREAK}. Je te reconnais."],
+                "oneSwitch": ["Un switch {SWITCH}. Bien tenté.", "Tu changes {SWITCH} pour me piéger. Mignon."],
+                "alternating": ["Tu changes pour me brouiller. Bien tenté.", "Tu varies pour m'avoir. Pas mal."],
+                "mixed": ["Tu varies… mais on voit quand même le schéma."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu as voulu m'avoir en restant sur {DOM}. Classique.", "Tu pensais que la constance allait te sauver. Non."],
+                "alternating": ["Tu as voulu me perdre en changeant. Joli.", "Tu pensais que ça allait me déstabiliser. Raté."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) ? Je te l'offre. Volontairement."],
+                "twoMiss": ["Je te laisse {MISSES} fois. Juste pour te donner l'illusion."],
+                "allMiss": ["Je te laisse tout exprès. Je veux que tu y crois."],
+                "generic": ["Mes ratés sont choisis. Toujours."]
+              },
+              "closers": ["Voilà.", "Simple.", "À toi."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["Je note : {SPECT_SEQ}.", "Ok : {SPECT_SEQ}."],
+              "performerLines": ["Moi, je note aussi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu changes {SWITCH}."],
+                "alternating": ["Tu changes pour brouiller."],
+                "mixed": ["Tu varies un peu."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu veux me tester en restant simple."],
+                "alternating": ["Tu veux me brouiller en changeant."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est volontaire."],
+                "twoMiss": ["Je te laisse {MISSES} fois. Volontairement."],
+                "allMiss": ["Je te laisse tout exprès."],
+                "generic": ["Si je rate, c'est voulu."]
+              },
+              "closers": ["On y va."]
+            },
+            "confident": {
+              "hooks": ["Je le note maintenant : {SPECT_SEQ}.", "C'est clair : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Point."],
+              "patternLines": {
+                "repeatHeavy": ["Tu t'installes sur {DOM}. {STREAK}. Je le vois."],
+                "oneSwitch": ["Tu changes {SWITCH}. Ça ne change rien."],
+                "alternating": ["Tu alternes. Ça ne me dérange pas."],
+                "mixed": ["Tu bouges un peu. Le fond reste."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu crois me tester. Je te lis."],
+                "alternating": ["Tu crois me brouiller. Je reste."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est choisi."],
+                "twoMiss": ["Les {MISSES} ratés sont choisis."],
+                "allMiss": ["Je laisse tout. C'est le plan."],
+                "generic": ["Mes ratés sont des choix."]
+              },
+              "closers": ["Exactement.", "Voilà."]
+            },
+            "humor": {
+              "hooks": ["Voyons voir : {SPECT_SEQ}.", "Je mise sur {SPECT_SEQ}."],
+              "performerLines": ["Moi je mets {PERF_SEQ}. On verra bien."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Classique."],
+                "oneSwitch": ["Tu changes {SWITCH}. Joli."],
+                "alternating": ["Tu alternes. Pour le style."],
+                "mixed": ["Tu varies. Ça fait sérieux."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu veux me piéger. Mignon."],
+                "alternating": ["Tu veux me perdre. Presque."]
+              },
+              "missLines": {
+                "oneMiss": ["Je \"rate\" {MISS_ROUNDS}. Pour le drama."],
+                "twoMiss": ["Je laisse {MISSES} fois. Pour le suspense."],
+                "allMiss": ["Je laisse tout. Suspense maximum."],
+                "generic": ["Si je rate, c'est du cinéma."]
+              },
+              "closers": ["Vas-y.", "Go."]
+            },
+            "taquin": {
+              "hooks": ["Allez : {SPECT_SEQ}.", "Je parie : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Évidemment."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Prévisible."],
+                "oneSwitch": ["Tu changes {SWITCH}. Bien tenté."],
+                "alternating": ["Tu alternes pour m'avoir. Mignon."],
+                "mixed": ["Tu varies. Ça ne suffit pas."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu crois que ça va marcher. Non."],
+                "alternating": ["Tu crois m'avoir. Pas encore."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est un cadeau."],
+                "twoMiss": ["Les {MISSES} ratés sont des cadeaux."],
+                "allMiss": ["Je te laisse tout. Profite."],
+                "generic": ["Mes ratés sont des cadeaux."]
+              },
+              "closers": ["À toi.", "Voilà."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["J'avais écrit : {SPECT_SEQ}.", "J'avais noté : {SPECT_SEQ}."],
+              "performerLines": ["Et moi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu as changé {SWITCH}."],
+                "alternating": ["Tu as changé pour brouiller."],
+                "mixed": ["Tu as varié un peu."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu voulais me tester en restant simple."],
+                "alternating": ["Tu voulais me brouiller en changeant."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) était volontaire."],
+                "twoMiss": ["Je t'ai laissé {MISSES} fois. Volontairement."],
+                "allMiss": ["Je t'ai laissé tout exprès."],
+                "generic": ["Si j'ai raté, c'était voulu."]
+              },
+              "closers": ["Voilà ce qui était prévu."]
+            },
+            "confident": {
+              "hooks": ["J'avais écrit ça : {SPECT_SEQ}.", "C'était noté : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Comme prévu."],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}. Normal."],
+                "oneSwitch": ["Tu as changé {SWITCH}. Ça n'a rien changé."],
+                "alternating": ["Tu as alterné. Ça ne m'a pas gêné."],
+                "mixed": ["Tu as varié. Le schéma était là."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu as voulu me tester. Raté."],
+                "alternating": ["Tu as voulu me perdre. Raté."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) était prévu."],
+                "twoMiss": ["Les {MISSES} ratés étaient prévus."],
+                "allMiss": ["J'ai tout laissé. C'était le plan."],
+                "generic": ["Mes ratés étaient calculés."]
+              },
+              "closers": ["Exactement comme prévu.", "Voilà."]
+            },
+            "humor": {
+              "hooks": ["J'avais noté un truc : {SPECT_SEQ}.", "Voyons voir… j'avais : {SPECT_SEQ}."],
+              "performerLines": ["Moi j'avais mis {PERF_SEQ}. Pas mal, non ?"],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}. Fidèle."],
+                "oneSwitch": ["Tu as changé {SWITCH}. Pour le style."],
+                "alternating": ["Tu as alterné. C'était mignon."],
+                "mixed": ["Tu as varié. Ça faisait pro."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu as voulu me piéger. C'était mignon."],
+                "alternating": ["Tu as voulu me perdre. Presque réussi."]
+              },
+              "missLines": {
+                "oneMiss": ["J'ai \"raté\" {MISS_ROUNDS}. Pour le suspense."],
+                "twoMiss": ["J'ai laissé {MISSES} fois. Pour le drama."],
+                "allMiss": ["J'ai tout laissé. Maximum suspense."],
+                "generic": ["Si j'ai raté, c'était du cinéma."]
+              },
+              "closers": ["Et voilà.", "Pas mal, non ?"]
+            },
+            "taquin": {
+              "hooks": ["J'avais ça : {SPECT_SEQ}.", "Regarde ce que j'avais : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Évidemment."],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}. Classique."],
+                "oneSwitch": ["Tu as changé {SWITCH}. Bien tenté."],
+                "alternating": ["Tu as alterné pour m'avoir. Raté."],
+                "mixed": ["Tu as varié. Ça n'a pas suffi."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu as voulu m'avoir. Pas cette fois."],
+                "alternating": ["Tu as voulu me brouiller. Raté."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) était un cadeau."],
+                "twoMiss": ["Les {MISSES} ratés étaient des cadeaux."],
+                "allMiss": ["Je t'ai tout laissé. De rien."],
+                "generic": ["Mes ratés étaient des cadeaux."]
+              },
+              "closers": ["Voilà.", "Tu m'as pas eu."]
+            }
+          }
+        },
+        "psychologique": {
+          "future": {
+            "neutral": {
+              "hooks": ["Petit test : tu vas faire {SPECT_SEQ}.", "Je pense que tu vas faire {SPECT_SEQ}."],
+              "performerLines": ["Moi, je vais écrire {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas revenir au familier : {DOM}. {STREAK}.", "Tu vas choisir la sécurité : {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu vas changer {SWITCH} pour te prouver que tu es libre.", "Tu vas faire un switch {SWITCH} pour te rassurer."],
+                "alternating": ["Tu vas changer pour te sentir imprévisible.", "Tu vas varier pour garder le contrôle."],
+                "mixed": ["Tu vas varier, mais ton réflexe ressortira."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["La constance, c'est la signature d'un choix assumé.", "Quand on est sûr, on répète."],
+                "alternating": ["Changer, c'est souvent une façon de \"reprendre la main\".", "Varier, c'est vouloir contrôler l'impression qu'on donne."]
+              },
+              "missLines": {
+                "oneMiss": ["Je vais \"rater\" {MISS_ROUNDS} exprès : ça rend l'expérience crédible."],
+                "twoMiss": ["Je vais te laisser {MISSES} fois : sinon, ton cerveau rejette l'effet."],
+                "allMiss": ["Je vais te laisser tout exprès : c'est la meilleure façon d'installer la certitude."],
+                "generic": ["Mes ratés sont un choix. Pas une limite."]
+              },
+              "closers": ["C'est exactement ça : un réflexe qu'on croit libre."]
+            },
+            "confident": {
+              "hooks": ["Je le sais : tu vas faire {SPECT_SEQ}.", "C'est certain : tu vas faire {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Sans hésitation."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas t'ancrer sur {DOM}. {STREAK}. C'est ton socle."],
+                "oneSwitch": ["Tu vas changer {SWITCH} pour te sentir libre. Mais tu reviendras."],
+                "alternating": ["Tu vas alterner pour croire que tu contrôles."],
+                "mixed": ["Tu vas bouger, mais le pattern reste."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["La répétition révèle ce qu'on n'ose pas changer."],
+                "alternating": ["Le changement cache souvent une volonté de contrôle."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est calculé. Pour que tu y croies."],
+                "twoMiss": ["Les {MISSES} ratés sont calculés. Pour l'effet."],
+                "allMiss": ["Je laisse tout. C'est ainsi que ça fonctionne."],
+                "generic": ["Mes ratés servent l'effet."]
+              },
+              "closers": ["C'est ainsi que fonctionne le choix."]
+            },
+            "humor": {
+              "hooks": ["Analyse rapide : tu vas faire {SPECT_SEQ}.", "Je parie (scientifiquement) sur {SPECT_SEQ}."],
+              "performerLines": ["Moi je note {PERF_SEQ}. Pour la science."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Le cerveau aime le connu."],
+                "oneSwitch": ["Tu changes {SWITCH}. Pour te sentir libre."],
+                "alternating": ["Tu alternes. Le cerveau adore ça."],
+                "mixed": ["Tu varies. C'est humain."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["On répète ce qui rassure. C'est normal."],
+                "alternating": ["On change pour se sentir maître. Classique."]
+              },
+              "missLines": {
+                "oneMiss": ["Je \"rate\" {MISS_ROUNDS}. Sinon c'est suspect."],
+                "twoMiss": ["Je laisse {MISSES} fois. Pour la crédibilité."],
+                "allMiss": ["Je laisse tout. Pour que ça marche."],
+                "generic": ["Mes ratés sont stratégiques."]
+              },
+              "closers": ["Voilà comment ça marche."]
+            },
+            "taquin": {
+              "hooks": ["Je te vois venir : {SPECT_SEQ}.", "Laisse-moi deviner : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}. Comme d'habitude."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Prévisible."],
+                "oneSwitch": ["Tu changes {SWITCH}. Pour te rassurer."],
+                "alternating": ["Tu alternes. Pour te sentir malin."],
+                "mixed": ["Tu varies. Ça ne suffit pas."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu crois que la constance te protège. Non."],
+                "alternating": ["Tu crois que le changement me perd. Non."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est un cadeau."],
+                "twoMiss": ["Les {MISSES} ratés sont des cadeaux."],
+                "allMiss": ["Je te laisse tout. Profite."],
+                "generic": ["Mes ratés sont calculés."]
+              },
+              "closers": ["Tu es lisible."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["Je l'observe : {SPECT_SEQ}.", "Je le vois : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu t'installes sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu changes {SWITCH}."],
+                "alternating": ["Tu alternes."],
+                "mixed": ["Tu varies."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["La répétition montre la certitude."],
+                "alternating": ["Le changement montre le besoin de contrôle."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est voulu."],
+                "twoMiss": ["Les {MISSES} ratés sont voulus."],
+                "allMiss": ["Je laisse tout."],
+                "generic": ["Mes ratés sont choisis."]
+              },
+              "closers": ["C'est ainsi."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["J'avais prévu : {SPECT_SEQ}.", "Je l'avais vu : {SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu as changé {SWITCH}."],
+                "alternating": ["Tu as alterné."],
+                "mixed": ["Tu as varié."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["La répétition a montré ta certitude."],
+                "alternating": ["Le changement a montré ton besoin de contrôle."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) était voulu."],
+                "twoMiss": ["Les {MISSES} ratés étaient voulus."],
+                "allMiss": ["J'ai tout laissé."],
+                "generic": ["Mes ratés étaient choisis."]
+              },
+              "closers": ["C'était prévisible."]
+            }
+          }
+        },
+        "narratif": {
+          "future": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["Dans la marge, j'écris aussi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas rester sur {DOM}. {STREAK}. Comme si c'était écrit en toi."],
+                "oneSwitch": ["Tu vas changer {SWITCH}, puis revenir au fil."],
+                "alternating": ["Tu vas changer pour brouiller la piste."],
+                "mixed": ["Tu vas bouger, mais l'ordre va apparaître."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["On croit choisir. Souvent, on confirme.", "On répète ce qui nous rassure."],
+                "alternating": ["On change pour se prouver qu'on contrôle.", "On varie pour se sentir imprévisible."]
+              },
+              "missLines": {
+                "oneMiss": ["Je vais laisser {MISS_ROUNDS} volontairement, pour que l'histoire respire."],
+                "twoMiss": ["Je vais laisser {MISSES} fois volontairement. Le vrai point est ailleurs."],
+                "allMiss": ["Je vais tout laisser exprès. Pour que tu croies au hasard."],
+                "generic": ["Si je rate, c'est voulu. C'est le récit."]
+              },
+              "closers": ["Et l'ordre finit toujours par se montrer."]
+            },
+            "confident": {
+              "hooksFromFlavor": true,
+              "performerLines": ["J'écris ma part : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu vas t'ancrer sur {DOM}. {STREAK}. C'est ton histoire."],
+                "oneSwitch": ["Tu vas dévier {SWITCH}. Puis revenir."],
+                "alternating": ["Tu vas danser entre les options. Mais je connais le rythme."],
+                "mixed": ["Tu vas bouger. Mais le fil reste visible."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Le choix révèle ce qu'on n'ose pas quitter."],
+                "alternating": ["Le mouvement cache souvent une quête de liberté."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) fait partie du récit."],
+                "twoMiss": ["Les {MISSES} ratés font partie du récit."],
+                "allMiss": ["Tout est laissé. C'est l'histoire."],
+                "generic": ["Mes ratés sont l'histoire."]
+              },
+              "closers": ["L'histoire s'écrit comme prévu."]
+            },
+            "humor": {
+              "hooksFromFlavor": true,
+              "performerLines": ["Et moi, en coulisse : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Le destin est paresseux."],
+                "oneSwitch": ["Tu changes {SWITCH}. Pour le drama."],
+                "alternating": ["Tu alternes. Pour le suspense."],
+                "mixed": ["Tu varies. Pour faire intéressant."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["On répète ce qu'on connaît. C'est humain."],
+                "alternating": ["On change pour se sentir libre. C'est mignon."]
+              },
+              "missLines": {
+                "oneMiss": ["Je \"rate\" {MISS_ROUNDS}. Pour le plot twist."],
+                "twoMiss": ["Je laisse {MISSES} fois. Pour le suspense."],
+                "allMiss": ["Je laisse tout. Maximum drama."],
+                "generic": ["Mes ratés sont du scénario."]
+              },
+              "closers": ["Fin du premier acte."]
+            },
+            "taquin": {
+              "hooksFromFlavor": true,
+              "performerLines": ["Moi, je note : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu restes sur {DOM}. {STREAK}. Classique."],
+                "oneSwitch": ["Tu changes {SWITCH}. Pour faire genre."],
+                "alternating": ["Tu alternes. Pour m'avoir."],
+                "mixed": ["Tu varies. Ça ne suffit pas."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Tu crois te cacher. Je te vois."],
+                "alternating": ["Tu crois m'avoir. Pas encore."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) est un cadeau."],
+                "twoMiss": ["Les {MISSES} ratés sont des cadeaux."],
+                "allMiss": ["Tout laissé. De rien."],
+                "generic": ["Mes ratés sont des cadeaux."]
+              },
+              "closers": ["L'histoire était écrite."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["J'écris aussi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu t'installes sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu changes {SWITCH}."],
+                "alternating": ["Tu alternes."],
+                "mixed": ["Tu varies."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Le choix se répète."],
+                "alternating": ["Le mouvement continue."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) respire."],
+                "twoMiss": ["Les {MISSES} ratés respirent."],
+                "allMiss": ["Tout respire."],
+                "generic": ["Ça respire."]
+              },
+              "closers": ["L'ordre apparaît."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["J'avais écrit : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["Tu es resté sur {DOM}. {STREAK}."],
+                "oneSwitch": ["Tu as changé {SWITCH}."],
+                "alternating": ["Tu as alterné."],
+                "mixed": ["Tu as varié."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Le choix s'est répété."],
+                "alternating": ["Le mouvement s'est montré."]
+              },
+              "missLines": {
+                "oneMiss": ["Le \"raté\" ({MISS_ROUNDS}) a respiré."],
+                "twoMiss": ["Les {MISSES} ratés ont respiré."],
+                "allMiss": ["Tout a respiré."],
+                "generic": ["Ça a respiré."]
+              },
+              "closers": ["L'ordre s'est montré."]
+            }
+          }
+        },
+        "carnet": {
+          "future": {
+            "neutral": {
+              "hooks": ["Prédiction.", "{SPECT_SEQ}."],
+              "performerLines": ["Moi : {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch: {SWITCH}."],
+                "alternating": ["Alternance."],
+                "mixed": ["Variation légère."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Test: constance."],
+                "alternating": ["Test: brouillage."]
+              },
+              "missLines": {
+                "oneMiss": ["Raté {MISS_ROUNDS} = volontaire."],
+                "twoMiss": ["{MISSES} ratés = volontaire."],
+                "allMiss": ["Tout laissé exprès."],
+                "generic": ["Ratés = joués."]
+              },
+              "closers": ["Fin."]
+            },
+            "confident": {
+              "hooks": ["Prédiction certaine.", "{SPECT_SEQ}. Sûr."],
+              "performerLines": ["{PERF_SEQ}. Point."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}. Évident."],
+                "oneSwitch": ["Switch {SWITCH}. Prévu."],
+                "alternating": ["Alternance. Prévu."],
+                "mixed": ["Variation. Prévu."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Constance = visible."],
+                "alternating": ["Brouillage = visible."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = choisi."],
+                "twoMiss": ["{MISSES} = choisis."],
+                "allMiss": ["Tout = choisi."],
+                "generic": ["Choisi."]
+              },
+              "closers": ["Exact."]
+            },
+            "humor": {
+              "hooks": ["Note:", "{SPECT_SEQ}. (oui oui)"],
+              "performerLines": ["{PERF_SEQ}. On verra."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}. Classique."],
+                "oneSwitch": ["Switch {SWITCH}. Mignon."],
+                "alternating": ["Alternance. Pour le style."],
+                "mixed": ["Variation. Ça fait pro."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Constance. Normal."],
+                "alternating": ["Brouillage. Mignon."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = cadeau."],
+                "twoMiss": ["{MISSES} = cadeaux."],
+                "allMiss": ["Tout = cadeau."],
+                "generic": ["Cadeau."]
+              },
+              "closers": ["Voilà."]
+            },
+            "taquin": {
+              "hooks": ["Noté:", "{SPECT_SEQ}. Classique."],
+              "performerLines": ["{PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}. Prévisible."],
+                "oneSwitch": ["Switch {SWITCH}. Tenté."],
+                "alternating": ["Alternance. Tenté."],
+                "mixed": ["Variation. Insuffisant."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Test raté."],
+                "alternating": ["Brouillage raté."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = offert."],
+                "twoMiss": ["{MISSES} = offerts."],
+                "allMiss": ["Tout offert."],
+                "generic": ["Offert."]
+              },
+              "closers": ["Simple."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["Note:", "{SPECT_SEQ}."],
+              "performerLines": ["{PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch {SWITCH}."],
+                "alternating": ["Alternance."],
+                "mixed": ["Variation."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Constance."],
+                "alternating": ["Mouvement."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = voulu."],
+                "twoMiss": ["{MISSES} = voulus."],
+                "allMiss": ["Tout voulu."],
+                "generic": ["Voulu."]
+              },
+              "closers": ["OK."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["Noté:", "{SPECT_SEQ}."],
+              "performerLines": ["{PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch {SWITCH}."],
+                "alternating": ["Alternance."],
+                "mixed": ["Variation."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Constance notée."],
+                "alternating": ["Mouvement noté."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = voulu."],
+                "twoMiss": ["{MISSES} = voulus."],
+                "allMiss": ["Tout voulu."],
+                "generic": ["Voulu."]
+              },
+              "closers": ["Fin."]
+            }
+          }
+        }
+      }
+    },
+    "en": {
+      "limits": {
+        "direct": { "minWords": 35, "maxWords": 85 },
+        "psychological": { "minWords": 55, "maxWords": 110 },
+        "narrative": { "minWords": 55, "maxWords": 115 },
+        "notebook": { "minWords": 20, "maxWords": 60 }
+      },
+      "narrativeHooks": {
+        "dream": {
+          "future": {
+            "neutral": ["Last night I dreamed something simple: you'll go {SPECT_SEQ}."],
+            "confident": ["Last night it was clear: you'll go {SPECT_SEQ}."],
+            "humor": ["I dreamed of you… and {SPECT_SEQ}. Yes, that counts."],
+            "taquin": ["I dreamed {SPECT_SEQ}. You're about to do it again, aren't you?"]
+          },
+          "present": {
+            "neutral": ["I keep seeing that dream: {SPECT_SEQ}."],
+            "confident": ["I can see it: {SPECT_SEQ}. Clear as day."],
+            "humor": ["I can still see it: {SPECT_SEQ}. Weirdly useful."],
+            "taquin": ["I can see it: {SPECT_SEQ}. So predictable (in a nice way)."]
+          },
+          "past": {
+            "neutral": ["Last night I had it in mind: {SPECT_SEQ}."],
+            "confident": ["Last night I already knew: {SPECT_SEQ}."],
+            "humor": ["Last night I had the most useful dream: {SPECT_SEQ}."],
+            "taquin": ["Last night I already saw {SPECT_SEQ}. You didn't stand a chance."]
+          }
+        },
+        "intuition": {
+          "future": {
+            "neutral": ["I've got a feeling: you'll go {SPECT_SEQ}."],
+            "confident": ["I can feel it: you'll go {SPECT_SEQ}."],
+            "humor": ["I've got a feeling. It's stubborn: {SPECT_SEQ}."],
+            "taquin": ["I've got a feeling you'll try {SPECT_SEQ}. Nice try."]
+          },
+          "present": {
+            "neutral": ["Right now, I've got a clear feeling: {SPECT_SEQ}."],
+            "confident": ["I can feel it now: {SPECT_SEQ}."],
+            "humor": ["My intuition just showed up… with {SPECT_SEQ}."],
+            "taquin": ["I'm watching you and I can feel it: {SPECT_SEQ}."]
+          },
+          "past": {
+            "neutral": ["I had a feeling: {SPECT_SEQ}."],
+            "confident": ["I already felt it: {SPECT_SEQ}."],
+            "humor": ["I had a feeling… and for once it helps: {SPECT_SEQ}."],
+            "taquin": ["I felt it coming: {SPECT_SEQ}. You'd do that."]
+          }
+        },
+        "premonition": {
+          "future": {
+            "neutral": ["Before you start: you'll go {SPECT_SEQ}."],
+            "confident": ["Before you start: {SPECT_SEQ}. No hesitation."],
+            "humor": ["Before you start… so you can't say I cheated: {SPECT_SEQ}."],
+            "taquin": ["Before you start: {SPECT_SEQ}. I know you'll try to trap me."]
+          },
+          "present": {
+            "neutral": ["I can sense it: {SPECT_SEQ}."],
+            "confident": ["It's obvious now: {SPECT_SEQ}."],
+            "humor": ["I can sense it… and it smells like {SPECT_SEQ}."],
+            "taquin": ["I can sense it: {SPECT_SEQ}. You've got a plan."]
+          },
+          "past": {
+            "neutral": ["I sensed it already: {SPECT_SEQ}."],
+            "confident": ["I knew it already: {SPECT_SEQ}."],
+            "humor": ["I sensed it. Conveniently: {SPECT_SEQ}."],
+            "taquin": ["I already knew: {SPECT_SEQ}. You're consistent."]
+          }
+        },
+        "chance": {
+          "future": {
+            "neutral": ["We'll call it 'random'… but you'll go {SPECT_SEQ}."],
+            "confident": ["'Random', sure. And yet: {SPECT_SEQ}."],
+            "humor": ["'Random'… of course. And you'll go {SPECT_SEQ}."],
+            "taquin": ["'Random'. And you'll still go {SPECT_SEQ}. Classic."]
+          },
+          "present": {
+            "neutral": ["People say 'random'. I see {SPECT_SEQ}."],
+            "confident": ["They say 'random'. I see {SPECT_SEQ}."],
+            "humor": ["'Random'… and yet: {SPECT_SEQ}."],
+            "taquin": ["'Random'… yeah yeah. And it becomes {SPECT_SEQ}."]
+          },
+          "past": {
+            "neutral": ["We said 'random'. It became {SPECT_SEQ}."],
+            "confident": ["We said 'random'. It became {SPECT_SEQ}. Obviously."],
+            "humor": ["We said 'random'. Result: {SPECT_SEQ}. Thanks, random."],
+            "taquin": ["We said 'random'. Result: {SPECT_SEQ}. You didn't get me."]
+          }
+        }
+      },
+      "styles": {
+        "direct": {
+          "future": {
+            "neutral": {
+              "hooks": ["Prediction: you'll go {SPECT_SEQ}.", "You'll go {SPECT_SEQ}."],
+              "performerLines": ["Me: I'll write {PERF_SEQ}.", "On my side: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You'll stick with {DOM}. {STREAK}.", "You'll settle on {DOM}. {STREAK}."],
+                "oneSwitch": ["You'll switch {SWITCH} just to blur it.", "One small switch {SWITCH}."],
+                "alternating": ["You'll switch to mess with me. I see it.", "You'll vary so it feels 'random'."],
+                "mixed": ["You'll vary a bit—just enough to believe it."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You tried to trap me by staying on {DOM}. Classic.", "You wanted to test me by keeping it simple."],
+                "alternating": ["You tried to confuse me by switching. Nice try.", "You thought switching would shake me. Not really."]
+              },
+              "missLines": {
+                "oneMiss": ["If I 'miss' {MISS_ROUNDS}, it's on purpose. Just to make it believable."],
+                "twoMiss": ["I'll let you win {MISSES} times—on purpose. Just to sell it."],
+                "allMiss": ["I'll let you have it—on purpose. Otherwise it's too perfect."],
+                "generic": ["If I miss, it's staged. Always."]
+              },
+              "closers": ["That's it.", "Let's go.", "Done."]
+            },
+            "confident": {
+              "hooks": ["I'm telling you: you'll go {SPECT_SEQ}.", "You'll go {SPECT_SEQ}. No surprise."],
+              "performerLines": ["I'll write {PERF_SEQ}. And I'll stick to it."],
+              "patternLines": {
+                "repeatHeavy": ["You'll impose {DOM}. {STREAK}. That's your reflex."],
+                "oneSwitch": ["You'll switch {SWITCH}, but come back to the core."],
+                "alternating": ["You'll switch to blur it. Won't be enough."],
+                "mixed": ["You'll vary, but the pattern stays visible."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You'll try to 'test' me. And betray yourself through consistency."],
+                "alternating": ["You'll want to trap me by varying. I'll be ready."]
+              },
+              "missLines": {
+                "oneMiss": ["The only 'miss' ({MISS_ROUNDS}) is intentional. I control the rhythm."],
+                "twoMiss": ["I'll let you have {MISSES} times, intentionally. It's staging."],
+                "allMiss": ["I'll let you have everything, on purpose. I want you to believe it."],
+                "generic": ["My 'misses' are chosen. Not suffered."]
+              },
+              "closers": ["As expected.", "Exactly.", "Moving on."]
+            },
+            "humor": {
+              "hooks": ["Ok. You'll go {SPECT_SEQ}. (Yes, I'm taking notes.)", "You'll go {SPECT_SEQ}. Let me try something."],
+              "performerLines": ["I'll put {PERF_SEQ}. And if I'm wrong, we'll call it theater."],
+              "patternLines": {
+                "repeatHeavy": ["You stick with {DOM}. {STREAK}. Comfort zone.", "You settle on {DOM}. {STREAK}. Cozy."],
+                "oneSwitch": ["You switch {SWITCH}. For show.", "One little switch {SWITCH}. Nice."],
+                "alternating": ["You switch to lose me. Nice try.", "You vary to look 'random'. Thanks."],
+                "mixed": ["You vary just enough to believe it. I see the plan."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You want to trap me by staying simple. Worth a shot.", "You want to test me. I get it."],
+                "alternating": ["You want to blur me. Nice try. Almost."]
+              },
+              "missLines": {
+                "oneMiss": ["I 'miss' {MISS_ROUNDS} on purpose. Otherwise you'll say I'm annoying."],
+                "twoMiss": ["I let you have {MISSES} times. Just so you smile."],
+                "allMiss": ["I let you have it all. So you feel confident."],
+                "generic": ["If I miss, it's intentional. Promise."]
+              },
+              "closers": ["Go ahead.", "Let's test.", "Go."]
+            },
+            "taquin": {
+              "hooks": ["Ok. You'll go {SPECT_SEQ}.", "I bet you'll go {SPECT_SEQ}."],
+              "performerLines": ["Me: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You stick with {DOM}. {STREAK}. Classic.", "Always {DOM}. {STREAK}. I know you."],
+                "oneSwitch": ["A switch {SWITCH}. Nice try.", "You switch {SWITCH} to trap me. Cute."],
+                "alternating": ["You switch to blur me. Nice try.", "You vary to get me. Not bad."],
+                "mixed": ["You vary… but the pattern still shows."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You tried to get me by staying on {DOM}. Classic.", "You thought consistency would save you. Nope."],
+                "alternating": ["You tried to lose me by switching. Nice.", "You thought it would shake me. Nope."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS})? I'm giving it to you. On purpose."],
+                "twoMiss": ["I let you have {MISSES} times. Just to give you the illusion."],
+                "allMiss": ["I let you have it all. I want you to believe it."],
+                "generic": ["My misses are chosen. Always."]
+              },
+              "closers": ["There.", "Simple.", "Your turn."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["I note: {SPECT_SEQ}.", "Ok: {SPECT_SEQ}."],
+              "performerLines": ["Me, I also note: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You stick with {DOM}. {STREAK}."],
+                "oneSwitch": ["You switch {SWITCH}."],
+                "alternating": ["You switch to blur."],
+                "mixed": ["You vary a bit."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You want to test me by staying simple."],
+                "alternating": ["You want to blur me by switching."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) is intentional."],
+                "twoMiss": ["I let you have {MISSES} times. Intentionally."],
+                "allMiss": ["I let you have it all."],
+                "generic": ["If I miss, it's on purpose."]
+              },
+              "closers": ["Let's go."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["I had written: {SPECT_SEQ}.", "I had noted: {SPECT_SEQ}."],
+              "performerLines": ["And me: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You stayed on {DOM}. {STREAK}."],
+                "oneSwitch": ["You switched {SWITCH}."],
+                "alternating": ["You switched to blur."],
+                "mixed": ["You varied a bit."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["You wanted to test me by staying simple."],
+                "alternating": ["You wanted to blur me by switching."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) was intentional."],
+                "twoMiss": ["I let you have {MISSES} times. Intentionally."],
+                "allMiss": ["I let you have it all."],
+                "generic": ["If I missed, it was on purpose."]
+              },
+              "closers": ["That's what was planned."]
+            }
+          }
+        },
+        "psychological": {
+          "future": {
+            "neutral": {
+              "hooks": ["Quick test: you'll go {SPECT_SEQ}.", "I think you'll go {SPECT_SEQ}."],
+              "performerLines": ["And I'll write {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You'll return to what feels safe: {DOM}. {STREAK}.", "You'll choose familiarity: {DOM}. {STREAK}."],
+                "oneSwitch": ["You'll switch {SWITCH} to prove you're free.", "One switch {SWITCH} to reassure yourself."],
+                "alternating": ["You'll vary to feel unpredictable.", "You'll switch to keep control of the impression."],
+                "mixed": ["You'll vary, but the reflex still shows."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Consistency is what people do when they're certain.", "When you're sure, you repeat."],
+                "alternating": ["Switching is often a way to 'take back control'.", "Varying is how we try to look unpredictable."]
+              },
+              "missLines": {
+                "oneMiss": ["I'll 'miss' {MISS_ROUNDS} on purpose—so your brain accepts it."],
+                "twoMiss": ["I'll let you have {MISSES} on purpose—otherwise it's too clean."],
+                "allMiss": ["I'll let you have it on purpose—it plants certainty."],
+                "generic": ["Any 'miss' is chosen. Not accidental."]
+              },
+              "closers": ["That's the thing: a reflex that feels like freedom."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["I'm observing: {SPECT_SEQ}.", "I see it: {SPECT_SEQ}."],
+              "performerLines": ["Me: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You settle on {DOM}. {STREAK}."],
+                "oneSwitch": ["You switch {SWITCH}."],
+                "alternating": ["You alternate."],
+                "mixed": ["You vary."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Repetition shows certainty."],
+                "alternating": ["Change shows need for control."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) is intended."],
+                "twoMiss": ["The {MISSES} misses are intended."],
+                "allMiss": ["I let it all happen."],
+                "generic": ["My misses are chosen."]
+              },
+              "closers": ["That's how it is."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["I had predicted: {SPECT_SEQ}.", "I saw it: {SPECT_SEQ}."],
+              "performerLines": ["Me: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You stayed on {DOM}. {STREAK}."],
+                "oneSwitch": ["You switched {SWITCH}."],
+                "alternating": ["You alternated."],
+                "mixed": ["You varied."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Repetition showed your certainty."],
+                "alternating": ["Change showed your need for control."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) was intended."],
+                "twoMiss": ["The {MISSES} misses were intended."],
+                "allMiss": ["I let it all happen."],
+                "generic": ["My misses were chosen."]
+              },
+              "closers": ["It was predictable."]
+            }
+          }
+        },
+        "narrative": {
+          "future": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["In the margin, I'll write: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You'll stick with {DOM}. {STREAK}. Like it was already in you."],
+                "oneSwitch": ["You'll switch {SWITCH}, then fall back into the thread."],
+                "alternating": ["You'll switch to blur the trail."],
+                "mixed": ["You'll move, but the order will show up."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["We think we choose. Often we confirm.", "We repeat what reassures us."],
+                "alternating": ["We switch to feel in control.", "We vary to feel unpredictable."]
+              },
+              "missLines": {
+                "oneMiss": ["I'll leave {MISS_ROUNDS} on purpose—so the story can breathe."],
+                "twoMiss": ["I'll leave {MISSES} on purpose. The real point is elsewhere."],
+                "allMiss": ["I'll leave it all on purpose—so you believe in chance."],
+                "generic": ["If I miss, it's part of the story."]
+              },
+              "closers": ["And the order always shows itself."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["I also write: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You settle on {DOM}. {STREAK}."],
+                "oneSwitch": ["You switch {SWITCH}."],
+                "alternating": ["You alternate."],
+                "mixed": ["You vary."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["The choice repeats."],
+                "alternating": ["The movement continues."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) breathes."],
+                "twoMiss": ["The {MISSES} misses breathe."],
+                "allMiss": ["Everything breathes."],
+                "generic": ["It breathes."]
+              },
+              "closers": ["The order appears."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooksFromFlavor": true,
+              "performerLines": ["I had written: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["You stayed on {DOM}. {STREAK}."],
+                "oneSwitch": ["You switched {SWITCH}."],
+                "alternating": ["You alternated."],
+                "mixed": ["You varied."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["The choice repeated."],
+                "alternating": ["The movement showed."]
+              },
+              "missLines": {
+                "oneMiss": ["The 'miss' ({MISS_ROUNDS}) breathed."],
+                "twoMiss": ["The {MISSES} misses breathed."],
+                "allMiss": ["Everything breathed."],
+                "generic": ["It breathed."]
+              },
+              "closers": ["The order revealed itself."]
+            }
+          }
+        },
+        "notebook": {
+          "future": {
+            "neutral": {
+              "hooks": ["Prediction.", "{SPECT_SEQ}."],
+              "performerLines": ["Me: {PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch: {SWITCH}."],
+                "alternating": ["Alternating."],
+                "mixed": ["Light variation."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Test: consistency."],
+                "alternating": ["Test: blur."]
+              },
+              "missLines": {
+                "oneMiss": ["Miss {MISS_ROUNDS} = staged."],
+                "twoMiss": ["{MISSES} misses = staged."],
+                "allMiss": ["All left on purpose."],
+                "generic": ["Misses = staged."]
+              },
+              "closers": ["End."]
+            }
+          },
+          "present": {
+            "neutral": {
+              "hooks": ["Note:", "{SPECT_SEQ}."],
+              "performerLines": ["{PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch {SWITCH}."],
+                "alternating": ["Alternating."],
+                "mixed": ["Variation."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Consistency."],
+                "alternating": ["Movement."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = intended."],
+                "twoMiss": ["{MISSES} = intended."],
+                "allMiss": ["All intended."],
+                "generic": ["Intended."]
+              },
+              "closers": ["OK."]
+            }
+          },
+          "past": {
+            "neutral": {
+              "hooks": ["Noted:", "{SPECT_SEQ}."],
+              "performerLines": ["{PERF_SEQ}."],
+              "patternLines": {
+                "repeatHeavy": ["{DOM} × {STREAK}."],
+                "oneSwitch": ["Switch {SWITCH}."],
+                "alternating": ["Alternating."],
+                "mixed": ["Variation."]
+              },
+              "intentLines": {
+                "repeatHeavy": ["Consistency noted."],
+                "alternating": ["Movement noted."]
+              },
+              "missLines": {
+                "oneMiss": ["{MISS_ROUNDS} = intended."],
+                "twoMiss": ["{MISSES} = intended."],
+                "allMiss": ["All intended."],
+                "generic": ["Intended."]
+              },
+              "closers": ["End."]
+            }
+          }
+        }
+      }
+    }
+  }
+}

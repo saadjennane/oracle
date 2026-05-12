@@ -1,0 +1,33 @@
+name: oracle_poc
+description: "ORACLE POC - A magic/mentalism prediction app"
+publish_to: 'none'
+version: 1.8.0+148
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  uuid: ^4.2.1
+  share_plus: ^12.0.2
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+  url_launcher: ^6.2.1
+  speech_to_text: ^7.3.0
+  http: ^1.6.0
+  wakelock_plus: ^1.2.8
+  image_gallery_saver: ^2.0.3
+  crypto: ^3.0.3
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

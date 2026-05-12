@@ -1,0 +1,49 @@
+{
+  "id": "signature_prewritten_ddg_fr_v1",
+  "language": "fr",
+  "rules": {
+    "predictionMode": "GAME",
+    "rounds": 3,
+    "inputMode": "preprogrammed",
+    "performerSequenceKey": "DDG"
+  },
+  "notes": {
+    "intent": "Ultra direct, ton taquin, futur, note tapée vite. Miss = volontaire. Toujours finir par: Au final, t'as choisi ou t'as cru choisir.",
+    "noArrows": true,
+    "noQuotes": true
+  },
+  "entries": {
+    "DDD": {
+      "spectatorSequenceKey": "DDD",
+      "text": "Tu vas tenter la technique du tout à droite.\nJe vais te laisser croire que ça marche.\nJe vais te suivre sur deux tours, et sur le dernier je vais partir exprès à gauche pour te donner ce petit plaisir.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "DDG": {
+      "spectatorSequenceKey": "DDG",
+      "text": "Tu vas faire deux fois droite, puis gauche au bon moment.\nAudacieux. Et ça pourrait marcher… jamais contre un mentaliste.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "DGD": {
+      "spectatorSequenceKey": "DGD",
+      "text": "Tu vas faire le zigzag classique : droite, gauche, droite.\nJe vais deviner le premier, et je vais perdre exprès sur les deux derniers juste pour te donner la satisfaction de te dire que tu m'as eu.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "DGG": {
+      "spectatorSequenceKey": "DGG",
+      "text": "Tu vas faire droite, puis deux fois gauche.\nJe vais te laisser gagner au milieu, juste pour te laisser croire que ton switch m'a eu.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "GDD": {
+      "spectatorSequenceKey": "GDD",
+      "text": "Tu vas faire gauche, puis deux fois droite.\nJe vais perdre exprès au début et à la fin, juste pour te donner cette satisfaction de te dire que tu m'as eu.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "GDG": {
+      "spectatorSequenceKey": "GDG",
+      "text": "Tu vas faire gauche, puis droite, puis gauche.\nJe vais t'offrir un cadeau en perdant le premier tour, juste pour te mettre en confiance.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "GGD": {
+      "spectatorSequenceKey": "GGD",
+      "text": "Tu vas faire gauche, gauche, puis droite.\nJe vais perdre exprès tout le long, juste pour te laisser le plaisir de penser que t'as battu un mentaliste.\nSauf que battre un mentaliste est plus compliqué qu'on le pense.\nAu final, t'as choisi ou t'as cru choisir."
+    },
+    "GGG": {
+      "spectatorSequenceKey": "GGG",
+      "text": "Tu vas rester sur gauche du début à la fin.\nJe vais te laisser les deux premiers tours, juste pour te donner l'impression que ta stratégie marche.\nEt oui, cette stratégie peut marcher… jamais contre un mentaliste.\nAu final, t'as choisi ou t'as cru choisir."
+    }
+  }
+}

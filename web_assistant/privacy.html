@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Oracle — Privacy Policy</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 0 20px 60px;
+    color: #222;
+    line-height: 1.6;
+    background: #fff;
+  }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  h2 { font-size: 18px; margin-top: 32px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+  p, li { font-size: 15px; }
+  ul { padding-left: 22px; }
+  .meta { color: #888; font-size: 13px; margin-top: 0; }
+  a { color: #0066cc; }
+  code { background: #f5f5f5; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy</h1>
+<p class="meta">El Oracle (iOS app) — Last updated: 2026-04-21</p>
+
+<p>
+  El Oracle is a performance tool for magicians and mentalists. This Privacy
+  Policy explains what data the app handles, where it is sent, and how it is
+  stored. The guiding principle: <strong>your data stays on your device or in
+  services you control</strong>. The developer does not operate a central
+  server and does not collect, store, or see any user data.
+</p>
+
+<h2>1. Data collected by the developer</h2>
+<p><strong>None.</strong></p>
+<p>
+  El Oracle has no user accounts, no sign-in, no analytics, no advertising
+  SDKs, and no tracking. The developer never receives any data from the app.
+</p>
+
+<h2>2. Data stored locally on your device</h2>
+<ul>
+  <li>
+    Presets you create (prediction templates, option labels, stealth input
+    configuration).
+  </li>
+  <li>Routines (ordered sequences of presets).</li>
+  <li>
+    App settings (language, haptic preferences, shortcut name, optional API
+    keys you choose to enter).
+  </li>
+  <li>Optional history of performed sessions.</li>
+  <li>
+    Images you upload to be used as prediction reveals or as screen
+    backgrounds (fake Notes / fake Calculator).
+  </li>
+</ul>
+<p>
+  All of the above is stored on your device using Apple’s
+  <code>SharedPreferences</code> and the app’s local file storage. You can
+  wipe everything at any time via iOS Settings → El Oracle → Reset, or by
+  uninstalling the app.
+</p>
+
+<h2>3. iCloud synchronization (optional, user-controlled)</h2>
+<p>
+  If you are signed in to iCloud on your Apple device, El Oracle can
+  synchronize the data listed above across your own Apple devices using:
+</p>
+<ul>
+  <li>
+    <strong>iCloud Key-Value Store</strong> — presets, routines, settings.
+  </li>
+  <li>
+    <strong>iCloud private container (iCloud Drive)</strong> — bank images
+    referenced by your presets.
+  </li>
+</ul>
+<p>
+  This data is stored in <em>your</em> iCloud account only. The developer
+  has no access to it. Apple’s privacy policy applies:
+  <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">
+    apple.com/legal/privacy
+  </a>.
+</p>
+
+<h2>4. Assistant mode (optional)</h2>
+<p>
+  When you use the “Assistant” input method, the app uses
+  <strong>Firebase Realtime Database</strong> (via REST) to pass the current
+  choice made on a second device (the assistant’s webapp at
+  <a href="https://oass.app" target="_blank" rel="noopener">oass.app</a>)
+  back to your phone. The following ephemeral data is exchanged:
+</p>
+<ul>
+  <li>An Assistant ID that you choose or let the app generate.</li>
+  <li>The current round’s choice (e.g. an option index or a free-text value).</li>
+  <li>A timestamp.</li>
+</ul>
+<p>
+  Sessions are cleared after the performance completes. This feature is
+  off by default and only activated when you explicitly select
+  “Assistant” as the input method on a preset. If you do not use Assistant
+  mode, <strong>no network request is made to Firebase</strong>.
+</p>
+
+<h2>5. OpenAI API (optional, user-supplied key)</h2>
+<p>
+  Two features can send text to OpenAI:
+</p>
+<ul>
+  <li>
+    <strong>AI text transformation</strong> inside Confabulation presets.
+  </li>
+  <li>
+    <strong>Audio input</strong> when you select the AI-assisted speech mode.
+  </li>
+</ul>
+<p>
+  Both require you to enter your own OpenAI API key in Settings. Requests
+  are sent directly from your device to
+  <code>api.openai.com</code> under your account. The developer does not
+  proxy or see the traffic. OpenAI’s privacy policy applies:
+  <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">
+    openai.com/policies/privacy-policy
+  </a>.
+  If you do not configure an API key, no request is made.
+</p>
+
+<h2>6. External APIs you configure (optional)</h2>
+<p>
+  For Confabulation presets you can opt in to fetch live data from third
+  parties you already use:
+</p>
+<ul>
+  <li>
+    <a href="https://11z.co" target="_blank" rel="noopener">11z.co</a>
+    (“Inject”)
+  </li>
+  <li>
+    <a href="https://pag.gg" target="_blank" rel="noopener">pag.gg</a>
+    (“Elips”)
+  </li>
+  <li>
+    <a href="https://skyhopgame.com" target="_blank" rel="noopener">skyhopgame.com</a>
+    (“HighScore”)
+  </li>
+</ul>
+<p>
+  The app contacts these endpoints only when you configure them with your
+  own identifier or API key and trigger the related feature. The developer
+  is not affiliated with these services; their respective privacy policies
+  apply.
+</p>
+
+<h2>7. Device permissions</h2>
+<ul>
+  <li>
+    <strong>Microphone &amp; Speech Recognition</strong> — used only while
+    the audio input method is active during a performance.
+  </li>
+  <li>
+    <strong>Photo Library</strong> — used only to save prediction images to
+    your gallery or to pick an image you want to use as a reveal background.
+    The app does not browse or upload your other photos.
+  </li>
+</ul>
+
+<h2>8. Children</h2>
+<p>
+  The app is intended for professional and amateur magicians and is not
+  directed at children under 13.
+</p>
+
+<h2>9. Changes to this policy</h2>
+<p>
+  If this policy changes, the “Last updated” date at the top will be
+  revised. Material changes will be announced in the app’s release notes
+  on TestFlight / the App Store.
+</p>
+
+<h2>10. Contact</h2>
+<p>
+  For any question regarding this policy or your data, contact:<br>
+  <a href="mailto:saadjennane@gmail.com">saadjennane@gmail.com</a>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Single Netlify deploy, two domains:
+#   - asmagicapps.com         → / (root index.html = the AS Magic Apps hub)
+#   - oracle.asmagicapps.com  → /oracle/ (Oracle landing page)
+#
+# Keep the mapping explicit by domain to avoid Host-condition ambiguity.
+
+[[redirects]]
+  from = "https://oracle.asmagicapps.com/*"
+  to = "/oracle/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "https://www.oracle.asmagicapps.com/*"
+  to = "/oracle/:splat"
+  status = 200
+  force = true

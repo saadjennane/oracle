@@ -1,0 +1,5 @@
+/privacy        /privacy.html   200
+/privacy.html   /privacy.html   200
+/tutorial       /tutorial.html  200
+/tutorial.html  /tutorial.html  200
+/*              /index.html     200
