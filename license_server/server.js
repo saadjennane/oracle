@@ -6,13 +6,17 @@ const app = express();
 app.use(express.json());
 
 const PORT = Number(process.env.PORT || 8787);
+const LICENSE_PROVIDER = String(process.env.LICENSE_PROVIDER || 'lemonsqueezy').toLowerCase();
 const API_KEY = process.env.LEMON_SQUEEZY_API_KEY || '';
 const STORE_ID = String(process.env.LEMON_SQUEEZY_STORE_ID || '');
+const POLAR_ACCESS_TOKEN = String(process.env.POLAR_ACCESS_TOKEN || '');
+const POLAR_ORGANIZATION_ID = String(process.env.POLAR_ORGANIZATION_ID || '');
 const APP_TOKEN = String(process.env.APP_TOKEN || '');
 const BETA_MASTER_KEY = String(process.env.BETA_MASTER_KEY || '');
 const COOLDOWN_HOURS = Number(process.env.LICENSE_COOLDOWN_HOURS || 24);
 const DATA_FILE = process.env.DATA_FILE || './data/licenses.json';
 const LS_API = 'https://api.lemonsqueezy.com/v1/licenses';
+const POLAR_API = 'https://api.polar.sh/v1/license-keys';
 
 function nowIso() {
   return new Date().toISOString();
@@ -53,6 +57,29 @@ async function lsRequest(endpoint, params) {
   const data = await res.json();
   if (!res.ok) {
     const message = data?.error || `Lemon Squeezy error (${res.status})`;
+    throw new Error(message);
+  }
+  return data;
+}
+
+async function polarRequest(endpoint, payload) {
+  if (!POLAR_ACCESS_TOKEN) throw new Error('Missing POLAR_ACCESS_TOKEN');
+  if (!POLAR_ORGANIZATION_ID) throw new Error('Missing POLAR_ORGANIZATION_ID');
+  const res = await fetch(`${POLAR_API}/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${POLAR_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({
+      ...payload,
+      organization_id: POLAR_ORGANIZATION_ID,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const message = data?.detail || data?.error || `Polar error (${res.status})`;
     throw new Error(message);
   }
   return data;
@@ -121,7 +148,7 @@ app.post('/license/activate', async (req, res) => {
         });
       }
 
-      if (row.instanceId) {
+      if (row.instanceId && LICENSE_PROVIDER === 'lemonsqueezy') {
         try {
           await lsRequest('deactivate', {
             license_key: licenseKey,
@@ -133,26 +160,44 @@ app.post('/license/activate', async (req, res) => {
       }
     }
 
-    const activation = await lsRequest('activate', {
-      license_key: licenseKey,
-      instance_name: `${instanceName}:${deviceId}`,
-    });
+    let status = 'active';
+    let instanceId = null;
+    let instanceNameOut = `${instanceName}:${deviceId}`;
 
-    const license = activation.license_key || {};
-    if (STORE_ID && String(license.store_id || '') !== STORE_ID) {
-      return res.status(403).json({ error: 'License belongs to a different store' });
-    }
-
-    if (license.status === 'disabled' || license.status === 'expired') {
-      return res.status(403).json({ error: `License status is ${license.status}` });
+    if (LICENSE_PROVIDER === 'polar') {
+      const activation = await polarRequest('activate', {
+        key: licenseKey,
+        label: `${instanceName}:${deviceId}`,
+      });
+      status = activation?.status || 'active';
+      instanceId = activation?.activation?.id || null;
+      instanceNameOut = activation?.activation?.label || instanceNameOut;
+      if (status === 'revoked' || status === 'disabled') {
+        return res.status(403).json({ error: `License status is ${status}` });
+      }
+    } else {
+      const activation = await lsRequest('activate', {
+        license_key: licenseKey,
+        instance_name: `${instanceName}:${deviceId}`,
+      });
+      const license = activation.license_key || {};
+      if (STORE_ID && String(license.store_id || '') !== STORE_ID) {
+        return res.status(403).json({ error: 'License belongs to a different store' });
+      }
+      if (license.status === 'disabled' || license.status === 'expired') {
+        return res.status(403).json({ error: `License status is ${license.status}` });
+      }
+      status = license.status;
+      instanceId = activation.instance?.id || null;
+      instanceNameOut = activation.instance?.name || instanceNameOut;
     }
 
     db.licenses[licenseKey] = {
       licenseKey,
       currentDeviceId: deviceId,
-      instanceId: activation.instance?.id || null,
-      instanceName: activation.instance?.name || null,
-      status: license.status,
+      instanceId,
+      instanceName: instanceNameOut,
+      status,
       lastSwitchAt: row?.currentDeviceId && row.currentDeviceId !== deviceId ? nowIso() : row?.lastSwitchAt || nowIso(),
       lastValidatedAt: nowIso(),
       updatedAt: nowIso(),
@@ -161,9 +206,10 @@ app.post('/license/activate', async (req, res) => {
 
     res.json({
       ok: true,
-      status: license.status,
+      status,
       currentDeviceId: deviceId,
       cooldownHours: COOLDOWN_HOURS,
+      provider: LICENSE_PROVIDER,
     });
   } catch (err) {
     res.status(400).json({ error: String(err.message || err) });
@@ -213,18 +259,28 @@ app.post('/license/validate', async (req, res) => {
       });
     }
 
-    const validation = await lsRequest('validate', { license_key: licenseKey });
-    const license = validation.license_key || {};
+    let status = row.status || 'active';
+    if (LICENSE_PROVIDER === 'polar') {
+      const validation = await polarRequest('validate', {
+        key: licenseKey,
+        activation_id: row.instanceId || undefined,
+      });
+      status = validation?.status || status;
+    } else {
+      const validation = await lsRequest('validate', { license_key: licenseKey });
+      const license = validation.license_key || {};
+      status = license.status || status;
+    }
 
-    if (license.status === 'expired' || license.status === 'disabled') {
-      row.status = license.status;
+    if (status === 'expired' || status === 'disabled' || status === 'revoked') {
+      row.status = status;
       row.lastValidatedAt = nowIso();
       row.updatedAt = nowIso();
       await writeDb(db);
-      return res.status(403).json({ error: `License status is ${license.status}`, code: 'LICENSE_INACTIVE' });
+      return res.status(403).json({ error: `License status is ${status}`, code: 'LICENSE_INACTIVE' });
     }
 
-    row.status = license.status;
+    row.status = status;
     row.lastValidatedAt = nowIso();
     row.updatedAt = nowIso();
     await writeDb(db);
@@ -232,8 +288,9 @@ app.post('/license/validate', async (req, res) => {
     res.json({
       ok: true,
       valid: true,
-      status: license.status,
+      status,
       currentDeviceId: row.currentDeviceId,
+      provider: LICENSE_PROVIDER,
     });
   } catch (err) {
     res.status(400).json({ error: String(err.message || err) });

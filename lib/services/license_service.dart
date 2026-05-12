@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,7 +7,7 @@ import 'package:uuid/uuid.dart';
 
 class LicenseService {
   static const String backendBaseUrl = 'https://license.asmagicapps.com';
-  static const String checkoutUrl = 'https://asmagicapps.lemonsqueezy.com/checkout/buy/1643369';
+  static const String checkoutUrl = 'https://buy.polar.sh/polar_cl_0BNfBdaRo4PQ9aa7avHA0hcAh8cesaeF7OAC120uymm';
   static const String appToken = 'ORACLE_MOBILE_V1';
   static const Duration offlineGrace = Duration(hours: 72);
 
@@ -37,37 +38,45 @@ class LicenseService {
   }
 
   Future<LicenseResult> activate(String licenseKey) async {
-    final deviceId = await getOrCreateDeviceId();
-    final uri = Uri.parse('$backendBaseUrl/license/activate');
+    try {
+      final deviceId = await getOrCreateDeviceId();
+      final uri = Uri.parse('$backendBaseUrl/license/activate');
 
-    final res = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'x-app-token': appToken,
-      },
-      body: jsonEncode({
-        'licenseKey': licenseKey.trim(),
-        'deviceId': deviceId,
-        'instanceName': 'Oracle Mobile',
-      }),
-    );
+      final res = await http
+          .post(
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+              'x-app-token': appToken,
+            },
+            body: jsonEncode({
+              'licenseKey': licenseKey.trim(),
+              'deviceId': deviceId,
+              'instanceName': 'Oracle Mobile',
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    final data = _decode(res.body);
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_licenseKeyKey, licenseKey.trim());
-      await prefs.setString(_lastValidatedAtKey, DateTime.now().toUtc().toIso8601String());
-      return const LicenseResult(ok: true);
+      final data = _decode(res.body);
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_licenseKeyKey, licenseKey.trim());
+        await prefs.setString(_lastValidatedAtKey, DateTime.now().toUtc().toIso8601String());
+        return const LicenseResult(ok: true);
+      }
+
+      final retry = data['retryInSeconds'];
+      return LicenseResult(
+        ok: false,
+        message: data['error']?.toString() ?? 'Activation failed',
+        retryInSeconds: retry is int ? retry : int.tryParse('${retry ?? ''}'),
+        code: data['code']?.toString(),
+      );
+    } on TimeoutException {
+      return const LicenseResult(ok: false, message: 'Network timeout. Please try again.');
+    } catch (_) {
+      return const LicenseResult(ok: false, message: 'Network error. Please try again.');
     }
-
-    final retry = data['retryInSeconds'];
-    return LicenseResult(
-      ok: false,
-      message: data['error']?.toString() ?? 'Activation failed',
-      retryInSeconds: retry is int ? retry : int.tryParse('${retry ?? ''}'),
-      code: data['code']?.toString(),
-    );
   }
 
   Future<LicenseResult> validate() async {
@@ -88,7 +97,7 @@ class LicenseService {
           'x-app-token': appToken,
         },
         body: jsonEncode({'licenseKey': licenseKey, 'deviceId': deviceId}),
-      );
+      ).timeout(const Duration(seconds: 10));
       final data = _decode(res.body);
 
       if (res.statusCode >= 200 && res.statusCode < 300) {
