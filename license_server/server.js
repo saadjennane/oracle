@@ -11,12 +11,14 @@ const API_KEY = process.env.LEMON_SQUEEZY_API_KEY || '';
 const STORE_ID = String(process.env.LEMON_SQUEEZY_STORE_ID || '');
 const POLAR_ACCESS_TOKEN = String(process.env.POLAR_ACCESS_TOKEN || '');
 const POLAR_ORGANIZATION_ID = String(process.env.POLAR_ORGANIZATION_ID || '');
+const PAYHIP_PRODUCT_SECRET_KEY = String(process.env.PAYHIP_PRODUCT_SECRET_KEY || '');
 const APP_TOKEN = String(process.env.APP_TOKEN || '');
 const BETA_MASTER_KEY = String(process.env.BETA_MASTER_KEY || '');
 const COOLDOWN_HOURS = Number(process.env.LICENSE_COOLDOWN_HOURS || 24);
 const DATA_FILE = process.env.DATA_FILE || './data/licenses.json';
 const LS_API = 'https://api.lemonsqueezy.com/v1/licenses';
 const POLAR_API = 'https://api.polar.sh/v1/license-keys';
+const PAYHIP_API = 'https://payhip.com/api/v2/license';
 
 function nowIso() {
   return new Date().toISOString();
@@ -83,6 +85,30 @@ async function polarRequest(endpoint, payload) {
     throw new Error(message);
   }
   return data;
+}
+
+async function payhipVerify(licenseKey) {
+  if (!PAYHIP_PRODUCT_SECRET_KEY) throw new Error('Missing PAYHIP_PRODUCT_SECRET_KEY');
+  const url = new URL(`${PAYHIP_API}/verify`);
+  url.searchParams.set('license_key', licenseKey);
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'product-secret-key': PAYHIP_PRODUCT_SECRET_KEY,
+    },
+  });
+  // Payhip can return empty body on failure.
+  const raw = await res.text();
+  if (!res.ok) throw new Error(`Payhip verify failed (${res.status})`);
+  if (!raw || !raw.trim()) return null;
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  return parsed?.data || null;
 }
 
 function requireFields(obj, fields) {
@@ -164,7 +190,15 @@ app.post('/license/activate', async (req, res) => {
     let instanceId = null;
     let instanceNameOut = `${instanceName}:${deviceId}`;
 
-    if (LICENSE_PROVIDER === 'polar') {
+    if (LICENSE_PROVIDER === 'payhip') {
+      const verified = await payhipVerify(licenseKey);
+      if (!verified || !verified.enabled) {
+        return res.status(403).json({ error: 'Invalid or disabled Payhip license key' });
+      }
+      status = 'active';
+      instanceId = null;
+      instanceNameOut = `${instanceName}:${deviceId}`;
+    } else if (LICENSE_PROVIDER === 'polar') {
       const activation = await polarRequest('activate', {
         key: licenseKey,
         label: `${instanceName}:${deviceId}`,
@@ -260,7 +294,10 @@ app.post('/license/validate', async (req, res) => {
     }
 
     let status = row.status || 'active';
-    if (LICENSE_PROVIDER === 'polar') {
+    if (LICENSE_PROVIDER === 'payhip') {
+      const verified = await payhipVerify(licenseKey);
+      status = verified?.enabled ? 'active' : 'disabled';
+    } else if (LICENSE_PROVIDER === 'polar') {
       const validation = await polarRequest('validate', {
         key: licenseKey,
         activation_id: row.instanceId || undefined,
