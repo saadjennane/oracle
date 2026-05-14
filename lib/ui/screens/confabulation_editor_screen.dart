@@ -206,6 +206,110 @@ class _ConfabulationEditorScreenState extends State<ConfabulationEditorScreen> {
     _showSlotModal(slot);
   }
 
+  Future<void> _showSlotActions(ConfabSlot slot) async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: AppTheme.textPrimary),
+              title: const Text('Edit', style: TextStyle(color: AppTheme.textPrimary)),
+              onTap: () => Navigator.pop(ctx, 'edit'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy, color: AppTheme.textPrimary),
+              title: const Text('Duplicate', style: TextStyle(color: AppTheme.textPrimary)),
+              onTap: () => Navigator.pop(ctx, 'duplicate'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
+              title: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+              onTap: () => Navigator.pop(ctx, 'delete'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.close, color: AppTheme.textSecondary),
+              title: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+              onTap: () => Navigator.pop(ctx, 'cancel'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted || action == null || action == 'cancel') return;
+    if (action == 'edit') {
+      _showEditSlotModal(slot);
+      return;
+    }
+    if (action == 'duplicate') {
+      _duplicateSlot(slot);
+      return;
+    }
+    if (action == 'delete') {
+      _confirmDeleteSlot(slot);
+    }
+  }
+
+  String _nextDuplicatedSlotLabel(String originalLabel) {
+    final base = originalLabel.trim();
+    int n = 2;
+    final existing = _slots.map((s) => s.label.toLowerCase()).toSet();
+    while (existing.contains('$base $n'.toLowerCase())) {
+      n++;
+    }
+    return '$base $n';
+  }
+
+  void _duplicateSlot(ConfabSlot slot) {
+    final duplicated = ConfabSlot(
+      id: 'slot_${DateTime.now().millisecondsSinceEpoch}',
+      label: _nextDuplicatedSlotLabel(slot.label),
+      options: List<String>.from(slot.options),
+    );
+    setState(() {
+      _slots.add(duplicated);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Slot duplicated')),
+    );
+  }
+
+  Future<void> _confirmDeleteSlot(ConfabSlot slot) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        title: const Text('Delete slot?', style: TextStyle(color: AppTheme.textPrimary)),
+        content: Text(
+          'This will remove "${slot.label}" from slots and from the template tags.',
+          style: const TextStyle(color: AppTheme.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      _deleteSlot(slot);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Slot deleted')),
+      );
+    }
+  }
+
   void _showSlotModal(ConfabSlot? existingSlot) {
     final isEditing = existingSlot != null;
     final nameController = TextEditingController(text: existingSlot?.label ?? '');
@@ -767,8 +871,7 @@ class _ConfabulationEditorScreenState extends State<ConfabulationEditorScreen> {
                   children: _slots.map((slot) {
                     return _SlotTag(
                       slot: slot,
-                      onTap: () => _insertSlotTag(slot),
-                      onEdit: () => _showEditSlotModal(slot),
+                      onTap: () => _showSlotActions(slot),
                     );
                   }).toList(),
                 ),
@@ -1204,12 +1307,10 @@ class _SectionTitle extends StatelessWidget {
 class _SlotTag extends StatelessWidget {
   final ConfabSlot slot;
   final VoidCallback onTap;
-  final VoidCallback onEdit;
 
   const _SlotTag({
     required this.slot,
     required this.onTap,
-    required this.onEdit,
   });
 
   @override
@@ -1243,15 +1344,6 @@ class _SlotTag extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 color: AppTheme.confabulationColor.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(width: 4),
-            GestureDetector(
-              onTap: onEdit,
-              child: Icon(
-                Icons.edit,
-                size: 16,
-                color: AppTheme.confabulationColor,
               ),
             ),
           ],

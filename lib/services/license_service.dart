@@ -7,7 +7,6 @@ import 'package:uuid/uuid.dart';
 
 class LicenseService {
   static const String backendBaseUrl = 'https://license.asmagicapps.com';
-  static const String checkoutUrl = 'https://buy.polar.sh/polar_cl_0BNfBdaRo4PQ9aa7avHA0hcAh8cesaeF7OAC120uymm';
   static const String appToken = 'ORACLE_MOBILE_V1';
   static const Duration offlineGrace = Duration(hours: 72);
 
@@ -29,6 +28,11 @@ class LicenseService {
   Future<String?> getSavedLicenseKey() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_licenseKeyKey);
+  }
+
+  Future<bool> hasSavedLicenseKey() async {
+    final key = await getSavedLicenseKey();
+    return key != null && key.isNotEmpty;
   }
 
   Future<void> clearLicense() async {

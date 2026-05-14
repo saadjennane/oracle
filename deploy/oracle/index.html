@@ -151,6 +151,12 @@
 
     /* Footer */
     footer { padding: 32px 0; border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 13px; }
+    .legal-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .legal-links a { color: var(--muted); }
+    .legal-links a:hover { color: var(--accent); }
+    .price-row { display: flex; align-items: baseline; justify-content: center; gap: 12px; margin: 8px 0 12px; }
+    .price-old { color: var(--muted); text-decoration: line-through; font-size: 30px; opacity: 0.8; font-family: 'Cormorant Garamond', Georgia, serif; }
+    .price-new { color: var(--accent); font-size: 44px; font-weight: 700; line-height: 1; font-family: 'Cormorant Garamond', Georgia, serif; }
 
     /* Mobile */
     @media (max-width: 720px) {
@@ -164,11 +170,11 @@
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 </head>
-<body>
+<body id="top">
 
 <header>
   <div class="container nav">
-    <div class="brand"><img src="oracle-logo.png" alt="Oracle logo" />Oracle<span class="dot">.</span></div>
+    <a href="#top" class="brand"><img src="oracle-logo.png" alt="Oracle logo" />Oracle<span class="dot">.</span></a>
     <nav>
       <ul>
         <li><a href="#how">How it works</a></li>
@@ -180,7 +186,7 @@
         <li><a href="#faq">FAQ</a></li>
       </ul>
     </nav>
-    <a href="#get" class="cta-btn">Get Oracle</a>
+    <a href="#pricing" class="cta-btn">Get Oracle</a>
   </div>
 </header>
 
@@ -189,7 +195,7 @@
     <h1>Predictions that <em>survive</em> any outcome.</h1>
     <p class="tagline">Written notes that match the spectator's free choices, every time. Revealed in the real iOS Notes app — no fake screens, no compromise.</p>
     <div class="hero-ctas">
-      <a href="#get" class="cta-btn">Get Oracle</a>
+      <a href="#pricing" class="cta-btn">Get Oracle</a>
       <a href="#how" class="cta-btn ghost">See how it works</a>
     </div>
   </div>
@@ -223,8 +229,8 @@
 
     <div class="notes-callout">
       <div>
-        <h3>The reveal lives in <span class="key">the real iOS Notes app</span>.</h3>
-        <p>Not a Flutter widget that imitates Notes. Not a fake screen. Oracle writes the matching prediction into your actual Notes app through a shortcut, so the spectator scrolls, swipes back to other notes, even searches. Everything is real.</p>
+        <h3>The reveal lives in <span class="key">YOUR REAL iOS Notes app</span>.</h3>
+        <p>Not a fake screen that imitates Notes. Oracle writes the matching prediction into your actual Notes app through a shortcut, so the spectator scrolls, swipes back to other notes, even searches. Everything is real.</p>
         <p>This is why Oracle works on examination. You can hand the phone over and walk away. Everything is clean!</p>
       </div>
       <div class="notes-mockup">
@@ -543,6 +549,23 @@
 
 <div class="hairline"></div>
 
+<section id="pricing">
+  <div class="container">
+    <span class="eyebrow">Launch Offer</span>
+    <h2>Launch price</h2>
+    <div class="price-row">
+      <span class="price-old">69€</span>
+      <span class="price-new">49€</span>
+    </div>
+    <p class="lead">Oracle is currently available at a special launch price of <strong>49€</strong>.</p>
+    <div class="hero-ctas">
+      <a href="https://payhip.com/b/8NxX7" class="cta-btn">Buy Now</a>
+    </div>
+  </div>
+</section>
+
+<div class="hairline"></div>
+
 <section id="faq">
   <div class="container">
     <span class="eyebrow">FAQ</span>
@@ -610,7 +633,7 @@
     <h2>Ready to put it on stage?</h2>
     <p>Oracle is in active development with monthly updates driven by working mentalists. Get a license and your account becomes part of the roadmap.</p>
     <div class="hero-ctas">
-      <a href="#" class="cta-btn">Get a license</a>
+      <a href="#pricing" class="cta-btn">Get a license</a>
       <a href="#" class="cta-btn ghost">Contact for demo</a>
     </div>
   </div>
@@ -619,6 +642,11 @@
 <footer>
   <div class="container">
     © 2026 Oracle. All performances are real. Some predictions may not be.
+    <div class="legal-links">
+      <a href="/oracle/terms.html">Terms of Service</a>
+      <a href="/oracle/privacy.html">Privacy Policy</a>
+      <a href="/oracle/refund.html">Refund Policy</a>
+    </div>
   </div>
 </footer>
 

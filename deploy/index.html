@@ -60,6 +60,9 @@
     .coming { color: var(--muted); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; }
 
     footer { margin-top: 80px; color: var(--muted); font-size: 12px; opacity: 0.6; }
+    .legal-links { margin-top: 10px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .legal-links a { color: var(--muted); }
+    .legal-links a:hover { color: var(--accent); }
 
     @media (max-width: 640px) {
       .app-card { flex-direction: column; align-items: flex-start; text-align: left; padding: 24px; gap: 16px; }
@@ -89,7 +92,14 @@
 
   <div class="coming">More apps coming soon</div>
 
-  <footer>© 2026 AS Magic Apps</footer>
+  <footer>
+    © 2026 AS Magic Apps
+    <div class="legal-links">
+      <a href="/oracle/terms.html">Terms of Service</a>
+      <a href="/oracle/privacy.html">Privacy Policy</a>
+      <a href="/oracle/refund.html">Refund Policy</a>
+    </div>
+  </footer>
 </div>
 
 </body>

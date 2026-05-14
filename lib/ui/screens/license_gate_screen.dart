@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'dart:async';
 import '../../services/license_service.dart';
 import '../../ui/theme/app_theme.dart';
 import 'home_screen.dart';
@@ -27,6 +26,18 @@ class _LicenseGateScreenState extends State<LicenseGateScreen> {
   }
 
   Future<void> _boot() async {
+    final hasLocalLicense = await _service.hasSavedLicenseKey();
+    if (!mounted) return;
+    if (hasLocalLicense) {
+      // Do not block startup for previously-activated users. Validation runs
+      // in the background when network is available.
+      unawaited(_service.validate());
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+      return;
+    }
+
     final result = await _service.validate();
     if (!mounted) return;
     if (result.ok) {
@@ -39,11 +50,6 @@ class _LicenseGateScreenState extends State<LicenseGateScreen> {
       _loading = false;
       _error = result.message;
     });
-  }
-
-  Future<void> _buy() async {
-    final uri = Uri.parse(LicenseService.checkoutUrl);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Future<void> _activate() async {
@@ -72,12 +78,6 @@ class _LicenseGateScreenState extends State<LicenseGateScreen> {
       _activating = false;
       _error = msg;
     });
-  }
-
-  void _enterWithoutLicense() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
   }
 
   @override
@@ -122,22 +122,6 @@ class _LicenseGateScreenState extends State<LicenseGateScreen> {
                 child: ElevatedButton(
                   onPressed: _activating ? null : _activate,
                   child: Text(_activating ? 'Activation...' : 'Activer ma licence'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _buy,
-                  child: const Text('Acheter une licence'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: _enterWithoutLicense,
-                  child: const Text('Enter without license'),
                 ),
               ),
             ],

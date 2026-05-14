@@ -13,7 +13,6 @@ const POLAR_ACCESS_TOKEN = String(process.env.POLAR_ACCESS_TOKEN || '');
 const POLAR_ORGANIZATION_ID = String(process.env.POLAR_ORGANIZATION_ID || '');
 const PAYHIP_PRODUCT_SECRET_KEY = String(process.env.PAYHIP_PRODUCT_SECRET_KEY || '');
 const APP_TOKEN = String(process.env.APP_TOKEN || '');
-const BETA_MASTER_KEY = String(process.env.BETA_MASTER_KEY || '');
 const COOLDOWN_HOURS = Number(process.env.LICENSE_COOLDOWN_HOURS || 24);
 const DATA_FILE = process.env.DATA_FILE || './data/licenses.json';
 const LS_API = 'https://api.lemonsqueezy.com/v1/licenses';
@@ -142,28 +141,6 @@ app.post('/license/activate', async (req, res) => {
     const db = await readDb();
     const row = db.licenses[licenseKey] || null;
 
-    // Temporary beta bypass key: no activation limit, no cooldown.
-    if (BETA_MASTER_KEY && licenseKey === BETA_MASTER_KEY) {
-      db.licenses[licenseKey] = {
-        licenseKey,
-        currentDeviceId: deviceId,
-        instanceId: null,
-        instanceName: `${instanceName}:${deviceId}`,
-        status: 'active',
-        isBetaMasterKey: true,
-        lastSwitchAt: nowIso(),
-        lastValidatedAt: nowIso(),
-        updatedAt: nowIso(),
-      };
-      await writeDb(db);
-      return res.json({
-        ok: true,
-        status: 'active',
-        currentDeviceId: deviceId,
-        betaBypass: true,
-      });
-    }
-
     if (row && row.currentDeviceId && row.currentDeviceId !== deviceId) {
       const remaining = msUntilCooldown(row.lastSwitchAt);
       if (remaining > 0) {
@@ -260,30 +237,7 @@ app.post('/license/validate', async (req, res) => {
     const db = await readDb();
     const row = db.licenses[licenseKey];
     if (!row) {
-      if (BETA_MASTER_KEY && licenseKey === BETA_MASTER_KEY) {
-        return res.json({
-          ok: true,
-          valid: true,
-          status: 'active',
-          currentDeviceId: deviceId,
-          betaBypass: true,
-        });
-      }
       return res.status(404).json({ error: 'License not activated on this server yet' });
-    }
-
-    if (row.isBetaMasterKey) {
-      row.currentDeviceId = deviceId;
-      row.lastValidatedAt = nowIso();
-      row.updatedAt = nowIso();
-      await writeDb(db);
-      return res.json({
-        ok: true,
-        valid: true,
-        status: 'active',
-        currentDeviceId: deviceId,
-        betaBypass: true,
-      });
     }
 
     if (row.currentDeviceId !== deviceId) {
