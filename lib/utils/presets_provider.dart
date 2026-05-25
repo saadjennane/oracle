@@ -128,7 +128,18 @@ class PresetsProvider extends ChangeNotifier {
     }
 
     try {
-      final stamped = preset.withTimestampNow();
+      Preset stamped = preset.withTimestampNow();
+
+      // Preserve chronological home ordering on edit: if the incoming preset
+      // has no createdAt (common for editor payloads), keep the existing
+      // stored createdAt for the same id instead of nulling it out.
+      final existingIndex = _presets.indexWhere((p) => p.id == stamped.id);
+      if (stamped.createdAt == null && existingIndex >= 0) {
+        final existingCreatedAt = _presets[existingIndex].createdAt;
+        if (existingCreatedAt != null) {
+          stamped = stamped.copyWith(createdAt: existingCreatedAt);
+        }
+      }
       await _repository!.upsertPreset(stamped);
 
       // Update in local list

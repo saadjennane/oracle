@@ -871,7 +871,8 @@ class _ConfabulationEditorScreenState extends State<ConfabulationEditorScreen> {
                   children: _slots.map((slot) {
                     return _SlotTag(
                       slot: slot,
-                      onTap: () => _showSlotActions(slot),
+                      onNameTap: () => _insertText('{{${slot.label}}}'),
+                      onMenuTap: () => _showSlotActions(slot),
                     );
                   }).toList(),
                 ),
@@ -1306,48 +1307,85 @@ class _SectionTitle extends StatelessWidget {
 
 class _SlotTag extends StatelessWidget {
   final ConfabSlot slot;
-  final VoidCallback onTap;
+  /// Tapping the name/label area inserts the slot's `{{Name}}` placeholder
+  /// into the template at the current cursor position.
+  final VoidCallback onNameTap;
+  /// Tapping the trailing 3-dot icon opens the Edit/Duplicate/Delete menu.
+  final VoidCallback onMenuTap;
 
   const _SlotTag({
     required this.slot,
-    required this.onTap,
+    required this.onNameTap,
+    required this.onMenuTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppTheme.confabulationColor.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppTheme.confabulationColor.withOpacity(0.5),
-            width: 1,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.confabulationColor.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.confabulationColor.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Tappable label — inserts the variable into the template.
+          InkWell(
+            onTap: onNameTap,
+            customBorder: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    slot.label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.confabulationColor,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '(${slot.options.length})',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.confabulationColor.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              slot.label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.confabulationColor,
+          // Tappable 3-dot menu trigger — opens Edit/Duplicate/Delete actions.
+          InkWell(
+            onTap: onMenuTap,
+            customBorder: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20),
               ),
             ),
-            const SizedBox(width: 4),
-            Text(
-              '(${slot.options.length})',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.confabulationColor.withOpacity(0.7),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 8, 10, 8),
+              child: Icon(
+                Icons.more_vert,
+                size: 16,
+                color: AppTheme.confabulationColor.withOpacity(0.75),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

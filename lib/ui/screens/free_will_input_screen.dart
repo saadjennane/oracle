@@ -55,6 +55,7 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
   List<String>? _runtimeLabels;
   bool _showLabelOverlay = false;
   late final List<TextEditingController> _labelControllers;
+  bool _inPreScreen = false;
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
         text: i < widget.config.objects.length ? widget.config.objects[i] : '',
       ),
     );
+    _inPreScreen = context.read<SettingsProvider>().preScreenEnabled;
     _initializeController();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
@@ -76,6 +78,7 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
     _controller = FreeWillInputController(
       inputMethod: widget.inputMethod,
       hapticFeedback: settings.hapticFeedback,
+      hapticIntensity: settings.hapticIntensity,
       suggestChangeOfMind: widget.config.suggestChangeOfMind,
       onInputCaptured: _onInputCaptured,
       onDeductionComplete: _onDeductionComplete,
@@ -126,9 +129,9 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
     _showStatus('LOCKED', duration: const Duration(seconds: 2));
   }
 
-  void _onRevealed(List<int> finalSlots, int swapCount) {
+  void _onRevealed(List<int> finalSlots, int swapCount, List<int>? lastSwapSlots) {
     // Build result from final slots
-    final result = _buildResult(finalSlots, swapCount);
+    final result = _buildResult(finalSlots, swapCount, lastSwapSlots);
     if (result != null) {
       // Restore UI and call completion
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -136,7 +139,7 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
     }
   }
 
-  FreeWillResult? _buildResult(List<int> slots, int swapCount) {
+  FreeWillResult? _buildResult(List<int> slots, int swapCount, List<int>? lastSwapSlots) {
     if (slots.length != 3) return null;
 
     final config = widget.config;
@@ -185,11 +188,23 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
       return null;
     }
 
+    // Resolve {lastSwap1}/{lastSwap2} object names from the swap's slot
+    // positions. The slot → object mapping after all swaps lines up with
+    // the action order: slot 0 ↔ take, slot 1 ↔ give, slot 2 ↔ table.
+    String? lastSwap1Obj, lastSwap2Obj;
+    if (lastSwapSlots != null && lastSwapSlots.length == 2) {
+      final slotObjects = [takeObject, giveObject, tableObject];
+      lastSwap1Obj = slotObjects[lastSwapSlots[0]];
+      lastSwap2Obj = slotObjects[lastSwapSlots[1]];
+    }
+
     return FreeWillResult(
       takeObject: takeObject,
       giveObject: giveObject,
       tableObject: tableObject,
       swapCount: swapCount,
+      lastSwap1Object: lastSwap1Obj,
+      lastSwap2Object: lastSwap2Obj,
     );
   }
 
@@ -388,7 +403,25 @@ class _FreeWillInputScreenState extends State<FreeWillInputScreen> {
 
           // Long-press label-edit overlay rendered on top of the fake note.
           if (_showLabelOverlay) _buildLabelOverlay(context),
+          if (_inPreScreen) _buildPreScreenOverlay(context),
         ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreScreenOverlay(BuildContext context) {
+    return Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => _inPreScreen = false),
+        child: Container(
+          color: Colors.black,
+          alignment: Alignment.center,
+          child: Text(
+            'Tap to continue',
+            style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 13),
+          ),
         ),
       ),
     );

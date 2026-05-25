@@ -118,6 +118,11 @@ class FreeWillInputState {
   /// Number of swaps performed
   int _swapCount = 0;
 
+  /// Slot indices (0-based) involved in the most recent swap, sorted asc.
+  /// Null until the first swap. Used to resolve `{lastSwap1}` / `{lastSwap2}`
+  /// placeholders inside the Change of Mind text.
+  List<int>? _lastSwapSlots;
+
   /// Input method being used
   final FreeWillInputMethod inputMethod;
 
@@ -135,6 +140,11 @@ class FreeWillInputState {
   List<int> get slots => List.unmodifiable(_slots);
   int get swapCount => _swapCount;
   bool get hasSwapped => _swapCount > 0;
+
+  /// Slot indices (0,1,2) involved in the most recent swap, ascending. Null
+  /// if no swap has occurred yet.
+  List<int>? get lastSwapSlots =>
+      _lastSwapSlots == null ? null : List.unmodifiable(_lastSwapSlots!);
 
   /// Get the final assignment: which input is in which slot
   /// Returns map: slotIndex (0,1,2) -> inputValue (1,2,3)
@@ -225,6 +235,8 @@ class FreeWillInputState {
     final temp = _slots[a];
     _slots[a] = _slots[b];
     _slots[b] = temp;
+    // Remember which slots were swapped — exposed as {lastSwap1}/{lastSwap2}.
+    _lastSwapSlots = [a, b]..sort();
   }
 
   /// Lock the state (no more inputs accepted)
@@ -252,6 +264,7 @@ class FreeWillInputState {
     _deducedInput = null;
     _slots = [1, 2, 3];
     _swapCount = 0;
+    _lastSwapSlots = null;
   }
 
   @override

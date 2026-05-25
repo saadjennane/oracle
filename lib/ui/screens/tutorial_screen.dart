@@ -224,7 +224,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
             'Template : "Tu penses à un {{Animal}} {{Couleur}}"\nSlots : Couleur (rouge, bleu, vert) + Animal (chat, chien, oiseau)\nRésultat : "Tu penses à un chat bleu"',
             'Plantilla: "Piensas en un {{Animal}} {{Color}}"\nResultado: "Piensas en un gato azul"')),
 
-        _H('Number'),
+        _H('Numbers'),
         _P(t('• Rainman — formula (e.g., 12345 - XXXX or XX * XX + X)\n• Birthday — birth date → day of the week + days since\n• Today — date complement',
             '• Rainman — formule (ex: 12345 - XXXX ou XX * XX + X)\n• Anniversaire — date → jour de la semaine + jours depuis\n• Aujourd\'hui — complément de date',
             '• Rainman — fórmula (ej: 12345 - XXXX)\n• Cumpleaños — fecha → día de la semana + días desde\n• Hoy — complemento de fecha')),

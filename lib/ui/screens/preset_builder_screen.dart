@@ -347,6 +347,50 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
     return _labelControllers.map((c) => c.text.trim()).toList();
   }
 
+  /// Capitalize the first letter of [s] (after trim). Leaves the rest of
+  /// the string untouched so casing within the body is preserved.
+  String _capitalizeFirst(String s) {
+    final t = s.trimLeft();
+    if (t.isEmpty) return s;
+    return t[0].toUpperCase() + t.substring(1);
+  }
+
+  /// Capitalize the first letter of every value in a bank-template map. Keys
+  /// (internal config like `__samePatternText__`) and empty values are left
+  /// alone. Returns null when input is null so optional-field semantics hold.
+  Map<String, String>? _capitalizeBank(Map<String, String>? bank) {
+    if (bank == null) return null;
+    return bank.map((k, v) => MapEntry(k, v.trim().isEmpty ? v : _capitalizeFirst(v)));
+  }
+
+  /// Same as [_capitalizeBank] but for the nested Choices preprogrammed
+  /// bank shape (performer-key → spectator-key → text).
+  Map<String, Map<String, String>>? _capitalizeNestedBank(
+      Map<String, Map<String, String>>? bank) {
+    if (bank == null) return null;
+    return bank.map((outerKey, innerMap) => MapEntry(
+          outerKey,
+          innerMap.map((k, v) => MapEntry(k, v.trim().isEmpty ? v : _capitalizeFirst(v))),
+        ));
+  }
+
+  /// Insert a placeholder string into the Change of Mind text field at the
+  /// current cursor position (or append if the field hasn't been focused).
+  void _insertChangeMindPlaceholder(String placeholder) {
+    final controller = _changeMindTextController;
+    if (controller == null) return;
+    final selection = controller.selection;
+    final text = controller.text;
+    final insertAt = selection.isValid && selection.start >= 0 ? selection.start : text.length;
+    final endAt = selection.isValid && selection.end >= 0 ? selection.end : text.length;
+    final newText = text.replaceRange(insertAt, endAt, placeholder);
+    final newCursor = insertAt + placeholder.length;
+    controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursor),
+    );
+  }
+
   void _addOption() {
     if (_type == PresetType.duel || _nbOptions >= 6) return;
     setState(() {
@@ -419,6 +463,31 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
         errors['label_$i'] = _language == Language.french
             ? 'Le label ne peut pas être vide'
             : 'Label cannot be empty';
+      }
+    }
+
+    // Swipe patterns validation (clockSwipe): all options must have the same
+    // number of gestures and each pattern must be non-empty.
+    // `_swipePatterns == null` is OK — the save path auto-fills defaults via
+    // `_getDefaultSwipePatterns(_nbOptions)` (see `_buildPreset` below). The
+    // Free Will builder doesn't expose a pattern editor at all, so null is
+    // the normal state for that preset type.
+    if (_stealthInputMethod == StealthInputMethod.clockSwipe) {
+      final patterns = _swipePatterns;
+      if (patterns != null) {
+        if (patterns.length != _nbOptions) {
+          errors['swipe_patterns'] = _language == Language.french
+              ? 'Patterns de swipe incomplets'
+              : 'Incomplete swipe patterns';
+        } else {
+          final lengths = patterns.map((p) => p.length).toSet();
+          final hasEmpty = patterns.any((p) => p.isEmpty);
+          if (hasEmpty || lengths.length != 1) {
+            errors['swipe_patterns'] = _language == Language.french
+                ? 'Chaque option doit avoir exactement le même nombre de swipes'
+                : 'Each option must have exactly the same number of swipes';
+          }
+        }
       }
     }
 
@@ -614,7 +683,7 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
 
     final preset = Preset(
       id: _editingId,
-      name: _nameController.text.trim(),
+      name: _capitalizeFirst(_nameController.text.trim()),
       type: _type,
       numberMode: _type == PresetType.number ? _numberMode : null,
       numberFormula: _type == PresetType.number ? _numberFormulaController.text.trim() : null,
@@ -658,27 +727,29 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
       // opened the pattern editor — otherwise we'd silently save a clockSwipe
       // preset with no patterns and the runtime swipe controller would be
       // skipped (= swipes ignored).
-      swipePatterns: _stealthInputMethod == StealthInputMethod.clockSwipe
-          ? (_swipePatterns ?? _getDefaultSwipePatterns(_nbOptions))
-              .map((dirs) => dirs.join(','))
-              .toList()
-          : null,
-      customPreprogrammedBanks: _customPreprogrammedBanks,
-      customDuelBankTemplates: _customDuelBankTemplates,
-      customChoicesBankTemplates: _type == PresetType.choices ? _customChoicesBankTemplates : null,
+      // Persist patterns independently from the current input method so edits
+      // are not lost when the performer temporarily switches methods.
+      swipePatterns: (_swipePatterns ?? (_stealthInputMethod == StealthInputMethod.clockSwipe
+              ? _getDefaultSwipePatterns(_nbOptions)
+              : null))
+          ?.map((dirs) => dirs.join(','))
+          .toList(),
+      customPreprogrammedBanks: _capitalizeNestedBank(_customPreprogrammedBanks),
+      customDuelBankTemplates: _capitalizeBank(_customDuelBankTemplates),
+      customChoicesBankTemplates: _type == PresetType.choices ? _capitalizeBank(_customChoicesBankTemplates) : null,
       choicesNarrativeMode: _choicesNarrativeMode,
       duelNarrativeMode: _duelNarrativeMode,
       freeWillConfig: freeWillConfig,
-      customFreeWillBankTemplates: _type == PresetType.freeWill ? _customFreeWillBankTemplates : null,
+      customFreeWillBankTemplates: _type == PresetType.freeWill ? _capitalizeBank(_customFreeWillBankTemplates) : null,
       freeWillBankMode: _type == PresetType.freeWill ? _freeWillBankMode : 'six',
       freeWillSingleTemplate: _type == PresetType.freeWill && _freeWillSingleTemplateController.text.trim().isNotEmpty
-          ? _freeWillSingleTemplateController.text
+          ? _capitalizeFirst(_freeWillSingleTemplateController.text)
           : null,
       multipleOutTexts: _type == PresetType.multipleOut
-          ? _multipleOutControllers.map((c) => c.text).toList()
+          ? _multipleOutControllers.map((c) => _capitalizeFirst(c.text)).toList()
           : null,
       multipleOutTitles: _type == PresetType.multipleOut
-          ? _multipleOutTitleControllers.map((c) => c.text).toList()
+          ? _multipleOutTitleControllers.map((c) => _capitalizeFirst(c.text)).toList()
           : null,
       multipleOutKeywords: _type == PresetType.multipleOut && _stealthInputMethod == StealthInputMethod.audio
           ? _multipleOutKeywordControllers.map((c) => c.text).toList()
@@ -1089,7 +1160,7 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
             : _type == PresetType.multipleOut
                 ? 'Multiple Out'
                 : _type == PresetType.number
-                    ? 'Number'
+                    ? 'Nombres'
                     : 'Choix';
     final typeNameEN = _type == PresetType.freeWill
         ? 'Free Will'
@@ -1098,7 +1169,7 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
             : _type == PresetType.multipleOut
                 ? 'Multiple Out'
                 : _type == PresetType.number
-                    ? 'Number'
+                    ? 'Numbers'
                     : 'Choices';
 
     return Scaffold(
@@ -2190,11 +2261,38 @@ class _PresetBuilderScreenState extends State<PresetBuilderScreen> {
                         ? 'Texte "Changement d\'avis"'
                         : '"Changed mind" text',
                     hintText: _language == Language.french
-                        ? 'Ex: Tu vas changer d\'avis, comme prévu.'
-                        : 'E.g., You\'ll change your mind, as expected.',
+                        ? 'Ex: Tu vas hésiter entre {lastSwap1} et {lastSwap2}.'
+                        : 'E.g., You\'ll hesitate between {lastSwap1} and {lastSwap2}.',
                   ),
                   style: const TextStyle(color: AppTheme.textPrimary),
                   maxLines: 2,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    _PlaceholderChip(
+                      placeholder: '{lastSwap1}',
+                      description: _language == Language.french ? '1er objet swap' : '1st swap object',
+                      onTap: () => _insertChangeMindPlaceholder('{lastSwap1}'),
+                    ),
+                    _PlaceholderChip(
+                      placeholder: '{lastSwap2}',
+                      description: _language == Language.french ? '2e objet swap' : '2nd swap object',
+                      onTap: () => _insertChangeMindPlaceholder('{lastSwap2}'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    _language == Language.french
+                        ? 'Variables disponibles : {lastSwap1} et {lastSwap2} — les deux objets impliqués dans le dernier swap.'
+                        : 'Available variables: {lastSwap1} and {lastSwap2} — the two objects involved in the most recent swap.',
+                    style: const TextStyle(color: AppTheme.textTertiary, fontSize: 11, fontStyle: FontStyle.italic),
+                  ),
                 ),
 
                 const SizedBox(height: 16),

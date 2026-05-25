@@ -309,6 +309,8 @@ class GameProvider extends ChangeNotifier {
         singleTemplate: singleTpl,
         changeMindText: config.changeMindText,
         noChangeMindText: config.noChangeMindText,
+        lastSwap1Object: result.lastSwap1Object,
+        lastSwap2Object: result.lastSwap2Object,
       );
     } else {
       narrative = FreeWillBankGeneratorEN.generateWithCustom(
@@ -322,6 +324,8 @@ class GameProvider extends ChangeNotifier {
         singleTemplate: singleTpl,
         changeMindText: config.changeMindText,
         noChangeMindText: config.noChangeMindText,
+        lastSwap1Object: result.lastSwap1Object,
+        lastSwap2Object: result.lastSwap2Object,
       );
     }
 

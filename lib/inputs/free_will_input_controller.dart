@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import '../models/stealth_input_method.dart';
+import '../utils/haptic_helper.dart';
 import 'free_will_input_state.dart';
 import 'volume_button_listener.dart';
 
@@ -9,7 +10,7 @@ typedef OnInputCaptured = void Function(FreeWillInput input, int captureIndex);
 typedef OnDeductionComplete = void Function(FreeWillInput deduced, List<int> initialSlots);
 typedef OnSwapPerformed = void Function(FreeWillSwapType swap, List<int> newSlots);
 typedef OnLocked = void Function();
-typedef OnRevealed = void Function(List<int> finalSlots, int swapCount);
+typedef OnRevealed = void Function(List<int> finalSlots, int swapCount, List<int>? lastSwapSlots);
 
 /// Controller for Free Will input handling
 ///
@@ -46,6 +47,7 @@ class FreeWillInputController {
 
   /// Whether haptic feedback is enabled
   final bool hapticFeedback;
+  final HapticIntensity hapticIntensity;
 
   /// If true, the swap phase stays open after the last input so the spectator
   /// can change their mind; the performer must then tap to lock+reveal.
@@ -86,6 +88,7 @@ class FreeWillInputController {
     this.onLocked,
     this.onRevealed,
     this.hapticFeedback = true,
+    this.hapticIntensity = HapticIntensity.medium,
     this.suggestChangeOfMind = false,
   }) : state = FreeWillInputState(inputMethod: inputMethod);
 
@@ -329,10 +332,16 @@ class FreeWillInputController {
 
     switch (result) {
       case FreeWillInputResult.captured:
+        if (hapticFeedback) {
+          HapticHelper.confirmOption(input.value - 1, intensity: hapticIntensity);
+        }
         onInputCaptured?.call(input, state.capturedInputs.length);
         break;
 
       case FreeWillInputResult.capturedAndTransitioned:
+        if (hapticFeedback) {
+          HapticHelper.confirmOption(input.value - 1, intensity: hapticIntensity);
+        }
         onInputCaptured?.call(input, state.capturedInputs.length);
         onDeductionComplete?.call(state.deducedInput!, state.slots);
         // Auto-lock + auto-reveal on the last input ONLY when the preset
@@ -382,7 +391,7 @@ class FreeWillInputController {
       if (hapticFeedback) {
         HapticFeedback.heavyImpact();
       }
-      onRevealed?.call(state.slots, state.swapCount);
+      onRevealed?.call(state.slots, state.swapCount, state.lastSwapSlots);
     }
   }
 

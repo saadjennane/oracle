@@ -206,6 +206,8 @@ class FreeWillBankGeneratorEN {
     required bool suggestChangeOfMind,
     String? changeMindText,
     String? noChangeMindText,
+    String? lastSwap1Object,
+    String? lastSwap2Object,
     int? seed,
   }) {
     // Determine permutation index
@@ -238,9 +240,11 @@ class FreeWillBankGeneratorEN {
     // L3: Free will punch
     lines.add(freeWill);
 
-    // L4: Optional change of mind line
+    // L4: Optional change of mind line — substitutes {lastSwap1}/{lastSwap2}
+    // when the spectator swapped.
     if (swapCount > 0) {
-      lines.add(changeMindText ?? _selectVariant(changeMindLinesEN, random));
+      final raw = changeMindText ?? _selectVariant(changeMindLinesEN, random);
+      lines.add(_substituteLastSwap(raw, lastSwap1Object, lastSwap2Object));
     } else if (suggestChangeOfMind) {
       lines.add(noChangeMindText ?? _selectVariant(noChangeMindLinesEN, random));
     }
@@ -264,13 +268,16 @@ class FreeWillBankGeneratorEN {
     String? singleTemplate,
     String? changeMindText,
     String? noChangeMindText,
+    String? lastSwap1Object,
+    String? lastSwap2Object,
     int? seed,
   }) {
     final random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
 
     String appendChangeMindLine(String body) {
       if (swapCount > 0) {
-        return '$body\n\n${changeMindText ?? _selectVariant(changeMindLinesEN, random)}';
+        final raw = changeMindText ?? _selectVariant(changeMindLinesEN, random);
+        return '$body\n\n${_substituteLastSwap(raw, lastSwap1Object, lastSwap2Object)}';
       } else if (suggestChangeOfMind) {
         return '$body\n\n${noChangeMindText ?? _selectVariant(noChangeMindLinesEN, random)}';
       }
@@ -312,8 +319,18 @@ class FreeWillBankGeneratorEN {
       suggestChangeOfMind: suggestChangeOfMind,
       changeMindText: changeMindText,
       noChangeMindText: noChangeMindText,
+      lastSwap1Object: lastSwap1Object,
+      lastSwap2Object: lastSwap2Object,
       seed: seed,
     );
+  }
+
+  /// Replace `{lastSwap1}` / `{lastSwap2}` in the change-of-mind line.
+  static String _substituteLastSwap(String text, String? swap1, String? swap2) {
+    var out = text;
+    out = out.replaceAll('{lastSwap1}', swap1 ?? '');
+    out = out.replaceAll('{lastSwap2}', swap2 ?? '');
+    return out;
   }
 
   /// Fallback minimal narrative if bank not found

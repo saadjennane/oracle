@@ -253,7 +253,7 @@ class _TemplateEntry {
       'duel' => 'Duel',
       'freeWill' => 'Free Will',
       'multipleOut' => 'Multiple Out',
-      'number' => 'Number',
+      'number' => 'Numbers',
       _ => 'Preset',
     };
   }
@@ -1086,7 +1086,7 @@ class _TemplateDetailScreen extends StatelessWidget {
       'duel' => 'Duel',
       'freeWill' => 'Free Will',
       'multipleOut' => 'Multiple Out',
-      'number' => 'Number',
+      'number' => 'Numbers',
       _ => type ?? '?',
     };
   }

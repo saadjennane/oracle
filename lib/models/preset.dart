@@ -28,7 +28,7 @@ enum PresetType {
       case PresetType.multipleOut:
         return locale == Language.french ? 'Sorties Multiples' : 'Multiple Out';
       case PresetType.number:
-        return locale == Language.french ? 'Nombre' : 'Number';
+        return locale == Language.french ? 'Nombres' : 'Numbers';
     }
   }
 
@@ -662,6 +662,24 @@ class Preset {
     int? numberMinutesOffset,
     String? numberOutputMode,
     String? numberNotesTemplate,
+    String? assistantRedirectUrl,
+    String? assistantInputMode,
+    int? acrosticPosition,
+    bool? autoCopyOverride,
+    String? shortcutNameOverride,
+    String? decoyTemplateId,
+    String? decoyInputType,
+    String? injectSuccessText,
+    String? injectFallbackText,
+    String? injectTransformPrompt,
+    String? elipsSuccessText,
+    String? elipsFallbackText,
+    String? elipsTransformPrompt,
+    String? highScoreSuccessText,
+    String? highScoreFallbackText,
+    String? highScoreLowText,
+    String? highScoreMedText,
+    String? highScoreHighText,
     DateTime? createdAt,
   }) {
     return Preset(
@@ -719,6 +737,24 @@ class Preset {
       numberMinutesOffset: numberMinutesOffset ?? this.numberMinutesOffset,
       numberOutputMode: numberOutputMode ?? this.numberOutputMode,
       numberNotesTemplate: numberNotesTemplate ?? this.numberNotesTemplate,
+      assistantRedirectUrl: assistantRedirectUrl ?? this.assistantRedirectUrl,
+      assistantInputMode: assistantInputMode ?? this.assistantInputMode,
+      acrosticPosition: acrosticPosition ?? this.acrosticPosition,
+      autoCopyOverride: autoCopyOverride ?? this.autoCopyOverride,
+      shortcutNameOverride: shortcutNameOverride ?? this.shortcutNameOverride,
+      decoyTemplateId: decoyTemplateId ?? this.decoyTemplateId,
+      decoyInputType: decoyInputType ?? this.decoyInputType,
+      injectSuccessText: injectSuccessText ?? this.injectSuccessText,
+      injectFallbackText: injectFallbackText ?? this.injectFallbackText,
+      injectTransformPrompt: injectTransformPrompt ?? this.injectTransformPrompt,
+      elipsSuccessText: elipsSuccessText ?? this.elipsSuccessText,
+      elipsFallbackText: elipsFallbackText ?? this.elipsFallbackText,
+      elipsTransformPrompt: elipsTransformPrompt ?? this.elipsTransformPrompt,
+      highScoreSuccessText: highScoreSuccessText ?? this.highScoreSuccessText,
+      highScoreFallbackText: highScoreFallbackText ?? this.highScoreFallbackText,
+      highScoreLowText: highScoreLowText ?? this.highScoreLowText,
+      highScoreMedText: highScoreMedText ?? this.highScoreMedText,
+      highScoreHighText: highScoreHighText ?? this.highScoreHighText,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: this.updatedAt,
     );

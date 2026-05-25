@@ -251,6 +251,10 @@ class SettingsScreen extends StatelessWidget {
               options: const {'notes': 'Notes', 'homescreen': 'Homescreen'},
               onChanged: (v) => settings.setPreScreenType(v),
             ),
+            if (settings.preScreenType == 'notes') ...[
+              Divider(height: 1, color: AppTheme.divider),
+              const _PreScreenNotesStatusTile(),
+            ],
             if (settings.preScreenType == 'homescreen') ...[
               Divider(height: 1, color: AppTheme.divider),
               _HomescreenUploadTile(
@@ -1410,6 +1414,86 @@ class _HomescreenUploadTile extends StatelessWidget {
     final savedFile = await File(image.path).copy('${dir.path}/$fileName');
 
     onChanged(savedFile.path);
+  }
+}
+
+class _PreScreenNotesStatusTile extends StatelessWidget {
+  const _PreScreenNotesStatusTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final reveal = context.watch<RevealProvider>();
+    final lightPath = reveal.config.lightListBackgroundPath;
+    final darkPath = reveal.config.darkListBackgroundPath;
+    final hasLight = lightPath != null && lightPath.isNotEmpty && File(lightPath).existsSync();
+    final hasDark = darkPath != null && darkPath.isNotEmpty && File(darkPath).existsSync();
+    final hasAny = hasLight || hasDark;
+
+    Widget thumb(String label, String path) {
+      return Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(File(path), height: 80, fit: BoxFit.cover, width: double.infinity),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Notes Pre-Screen', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.textPrimary)),
+          const SizedBox(height: 6),
+          Text(
+            hasAny
+                ? 'Using uploaded LIST SCREEN screenshots from Reveal Background'
+                : 'No Notes screenshot uploaded yet',
+            style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+          ),
+          const SizedBox(height: 10),
+          if (hasAny) ...[
+            Row(
+              children: [
+                if (hasLight) thumb('Light', lightPath!),
+                if (hasLight && hasDark) const SizedBox(width: 8),
+                if (hasDark) thumb('Dark', darkPath!),
+              ],
+            ),
+            const SizedBox(height: 10),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Use the "Reveal Background" section below to upload Notes screenshots.'),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              icon: Icon(hasAny ? Icons.tune : Icons.upload, size: 16),
+              label: Text(hasAny ? 'Manage in Reveal Background' : 'Upload in Reveal Background'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.primary,
+                side: const BorderSide(color: AppTheme.primary),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

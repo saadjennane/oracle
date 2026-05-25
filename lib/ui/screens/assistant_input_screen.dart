@@ -339,11 +339,24 @@ class _AssistantInputScreenState extends State<AssistantInputScreen> {
       final objectIndex = (slots[i] - 1).clamp(0, objects.length - 1);
       assignments[action] = objects[objectIndex];
     }
+    final takeObj = assignments[FreeWillAction.take]!;
+    final giveObj = assignments[FreeWillAction.give]!;
+    final tableObj = assignments[FreeWillAction.table]!;
+    // Same {lastSwap1}/{lastSwap2} resolution as the on-device flow.
+    String? ls1, ls2;
+    final lastSwapSlots = state.lastSwapSlots;
+    if (lastSwapSlots != null && lastSwapSlots.length == 2) {
+      final slotObjects = [takeObj, giveObj, tableObj];
+      ls1 = slotObjects[lastSwapSlots[0]];
+      ls2 = slotObjects[lastSwapSlots[1]];
+    }
     return FreeWillResult(
-      takeObject: assignments[FreeWillAction.take]!,
-      giveObject: assignments[FreeWillAction.give]!,
-      tableObject: assignments[FreeWillAction.table]!,
+      takeObject: takeObj,
+      giveObject: giveObj,
+      tableObject: tableObj,
       swapCount: state.swapCount,
+      lastSwap1Object: ls1,
+      lastSwap2Object: ls2,
     );
   }
 

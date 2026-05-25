@@ -56,6 +56,7 @@ class _NumberInputScreenState extends State<NumberInputScreen> {
 
   // Result
   String? _result;
+  bool _inPreScreen = false;
 
   @override
   void initState() {
@@ -73,6 +74,7 @@ class _NumberInputScreenState extends State<NumberInputScreen> {
     }
 
     _preset = args;
+    _inPreScreen = context.read<SettingsProvider>().preScreenEnabled;
     _mode = args.numberMode!;
     _formula = args.numberFormula ?? '_ + _';
 
@@ -401,11 +403,15 @@ class _NumberInputScreenState extends State<NumberInputScreen> {
 
     return RemoteKeyListener(
       onSwipeKey: _preset?.stealthInputMethod == StealthInputMethod.clockSwipe
-          ? (d) => _processSwipeDirection(d.name)
+          ? (d) {
+              if (_inPreScreen) return;
+              _processSwipeDirection(d.name);
+            }
           : null,
       child: GestureDetector(
       onLongPress: _cancelAndExit,
       onPanEnd: _preset?.stealthInputMethod == StealthInputMethod.clockSwipe ? (d) {
+        if (_inPreScreen) return;
         final dx = d.velocity.pixelsPerSecond.dx;
         final dy = d.velocity.pixelsPerSecond.dy;
         if (dx.abs() < 100 && dy.abs() < 100) return;
@@ -502,6 +508,21 @@ class _NumberInputScreenState extends State<NumberInputScreen> {
                           ),
                         ),
                     ],
+                  ),
+                ),
+              ),
+            if (_inPreScreen)
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _inPreScreen = false),
+                  child: Container(
+                    color: Colors.black,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Tap to continue',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 13),
+                    ),
                   ),
                 ),
               ),

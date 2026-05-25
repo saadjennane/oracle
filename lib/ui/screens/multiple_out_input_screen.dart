@@ -50,6 +50,7 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
   String? _debugMessage;
   int? _selectedIndex;
   bool _showingFeedback = false;
+  bool _inPreScreen = false;
 
   int get _textCount => widget.preset.multipleOutTexts?.length ?? 0;
   bool get _isVolume => widget.preset.stealthInputMethod == StealthInputMethod.volume;
@@ -69,6 +70,7 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
 
   Future<void> _initializeInputs() async {
     final settings = context.read<SettingsProvider>();
+    _inPreScreen = settings.preScreenEnabled;
 
     if (_isVolume) {
       _volumeController = VolumeInputController(
@@ -86,6 +88,7 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
         final started = await _volumeListener.startListening();
         if (started) {
           _volumeSubscription = _volumeListener.onVolumeButtonPressed.listen((direction) {
+            if (_inPreScreen) return;
             _volumeController?.handleVolumePress(direction);
           });
         }
@@ -146,6 +149,7 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
         final started = await _volumeListener.startListening();
         if (started) {
           _volumeSubscription = _volumeListener.onVolumeButtonPressed.listen((_) {
+            if (_inPreScreen) return;
             // Toggle listening on any volume press
             if (_audioController?.state == AudioInputState.listening ||
                 _audioController?.state == AudioInputState.active) {
@@ -271,12 +275,19 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
     }
 
     return RemoteKeyListener(
-      onVolumeKey: _isVolume ? (dir) => _volumeController?.handleVolumePress(dir) : null,
-      onSwipeKey: _isClockSwipe ? (dir) => _clockSwipeController?.handleSwipe(dir) : null,
+      onVolumeKey: _isVolume ? (dir) {
+        if (_inPreScreen) return;
+        _volumeController?.handleVolumePress(dir);
+      } : null,
+      onSwipeKey: _isClockSwipe ? (dir) {
+        if (_inPreScreen) return;
+        _clockSwipeController?.handleSwipe(dir);
+      } : null,
       child: GestureDetector(
       onLongPress: _confirmExit,
       onPanEnd: _isClockSwipe
           ? (details) {
+              if (_inPreScreen) return;
               final dir = _swipeDirectionFromVelocity(details.velocity);
               if (dir != null) {
                 _clockSwipeController?.handleSwipe(dir);
@@ -336,6 +347,21 @@ class _MultipleOutInputScreenState extends State<MultipleOutInputScreen> {
                 child: Container(width: 60, height: 60, color: Colors.transparent),
               ),
             ),
+            if (_inPreScreen)
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _inPreScreen = false),
+                  child: Container(
+                    color: Colors.black,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Tap to continue',
+                      style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 13),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

@@ -8,6 +8,7 @@ import '../../models/confabulation_preset.dart';
 import '../../utils/presets_provider.dart';
 import '../../utils/confabulation_provider.dart';
 import '../../utils/routine_provider.dart';
+import 'theme_preview_screen.dart';
 import '../../utils/game_provider.dart';
 import '../../utils/settings_provider.dart';
 import '../../utils/acrostic_provider.dart';
@@ -38,7 +39,7 @@ enum PresetCategory {
       case PresetCategory.multipleOut:
         return 'Multiple Out';
       case PresetCategory.number:
-        return 'Number';
+        return 'Numbers';
     }
   }
 
@@ -208,6 +209,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Row(
                     children: [
+                      // TEMP: visual theme comparator — remove once a
+                      // variant is chosen and the real refactor is done.
+                      IconButton(
+                        icon: const Icon(Icons.palette_outlined, color: AppTheme.textSecondary),
+                        tooltip: 'Theme preview',
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ThemePreviewScreen(),
+                          ),
+                        ),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.history, color: AppTheme.textSecondary),
                         onPressed: () => Navigator.pushNamed(context, '/history'),

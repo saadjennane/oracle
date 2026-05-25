@@ -312,8 +312,12 @@ class _PerformanceFlowScreenState extends State<PerformanceFlowScreen> {
       // Fallback to a sensible default mapping when patterns are missing —
       // otherwise picking Swipe in the builder without ever opening the
       // pattern editor would leave swipes silently ignored at showtime.
-      final patterns = (widget.swipePatterns != null && widget.swipePatterns!.isNotEmpty)
-          ? CustomSwipeInputController.parsePatterns(widget.swipePatterns!)
+      final raw = widget.swipePatterns;
+      final parsed = (raw != null && raw.isNotEmpty)
+          ? CustomSwipeInputController.parsePatterns(raw)
+          : null;
+      final patterns = _hasUniformSwipeLength(parsed)
+          ? parsed!
           : _defaultClockSwipePatterns(provider.options.length);
       _swipeInputController = CustomSwipeInputController(
         patterns: patterns,
@@ -326,6 +330,14 @@ class _PerformanceFlowScreenState extends State<PerformanceFlowScreen> {
     }
 
     _updateInputStage(provider);
+  }
+
+  bool _hasUniformSwipeLength(List<List<String>>? patterns) {
+    if (patterns == null || patterns.isEmpty) return false;
+    final lengths = patterns
+        .map((p) => p.where((s) => s.trim().isNotEmpty).length)
+        .toSet();
+    return lengths.length == 1 && lengths.first > 0;
   }
 
   /// Default 1-swipe-per-option mapping used when a clockSwipe preset has no

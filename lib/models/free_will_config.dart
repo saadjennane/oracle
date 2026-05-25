@@ -346,11 +346,20 @@ class FreeWillResult {
   final String tableObject;
   final int swapCount;
 
+  /// Objects involved in the most recent swap, ordered by their final slot
+  /// position (ascending). Null when no swap occurred. Surfaced as the
+  /// `{lastSwap1}` / `{lastSwap2}` template placeholders inside the
+  /// Change of Mind text.
+  final String? lastSwap1Object;
+  final String? lastSwap2Object;
+
   const FreeWillResult({
     required this.takeObject,
     required this.giveObject,
     required this.tableObject,
     required this.swapCount,
+    this.lastSwap1Object,
+    this.lastSwap2Object,
   });
 
   /// Bucket key for narrative bank lookup
